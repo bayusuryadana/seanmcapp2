@@ -7,8 +7,15 @@ WIP
 - ~~Web: Mamen, Dota, Wallet app~~
 - ~~Scheduler: Birthday, DotaMetadata, News, (broken: Instagram, Instastory, Twitter)~~
 
+## Setup
+python:
+1. python -m venv .venv
+2. .venv\Scripts\activate
+3. pip install -r requirements.txt 
+
 ## Prerequisites
-- Python, pip, 
+- Python
+- Node
  
 ## Infrastructure
 WIP
