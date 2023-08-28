@@ -1,6 +1,16 @@
 # Seanmcapp2
 Port application from [seanmcapp](https://github.com/bayusuryadana/seanmcapp)
 
+## Todo
+- postgreSQL + ORM
+- joda time/epoch
+- caching
+- storage
+- cron
+- HTML Parser
+-----
+- discord client
+
 ## Feature
 WIP
 - ~~API: telegram webhook~~

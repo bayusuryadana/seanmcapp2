@@ -1,4 +1,6 @@
 import requests
+import json
 
 def fetch():
-    return requests.get('http://seanmcapp.herokuapp.com/api/news').content
+    response = requests.get('http://seanmcapp.herokuapp.com/api/news').text
+    return json.loads(response)
