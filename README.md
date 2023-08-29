@@ -2,13 +2,10 @@
 Port application from [seanmcapp](https://github.com/bayusuryadana/seanmcapp)
 
 ## Todo
-- postgreSQL + ORM
-- joda time/epoch
-- caching
-- storage
-- cron
-- HTML Parser
+- HTML Parser (move news module)
 -----
+- storage (only used by photos)
+- joda time/epoch (only used by photos & caches)
 - discord client
 
 ## Feature
