@@ -1,6 +1,6 @@
-from .database import Database
-from .external import fetch
-from .task import job
+from database import Database
+from external import fetch
+from task import job
 from dotenv import load_dotenv
 from flask import Flask, render_template
 from time import sleep
