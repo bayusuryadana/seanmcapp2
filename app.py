@@ -1,46 +1,37 @@
 from database import Database
 from external import fetch
-from task import job
 from dotenv import load_dotenv
 from flask import Flask, render_template
 from time import sleep
-import threading, configparser, atexit, schedule
+import threading, atexit, schedule
 from util import *
 
-class App:
-    def __init__(self):
-        load_dotenv() # development use only
-        self.db = Database()
+load_dotenv() # development use only
+db = Database()
     
-app = App()
-
 def cleanup():
     print('stopping all scheduled task...')
     schedule.clear()
     print('closing DB connection...')
-    app.db.close_connection
+    db.close_connection
     print('bye bye :)')
 
 atexit.register(cleanup)
 
 #################### route starts here ####################
 
-flask = Flask(__name__, static_folder='__templates__/static', template_folder='__templates__')
+app = Flask(__name__, static_folder='__templates__/static', template_folder='__templates__')
 
-@flask.route('/api/<path:path>')
+@app.route('/api/<path:path>')
 def api(path):
     match path:
         case 'dota':
             return fetch()
-        case 'person':
-            return app.db.scheduled_birthday()
-        case 'time':
-            return str(get_current_time())
         case _:
             return 'API'
 
-@flask.route('/', defaults={'path': ''})
-@flask.route('/<path:path>')
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
 def index(path):
     return render_template('index.html')
 
@@ -48,12 +39,11 @@ def index(path):
 
 def scheduled_task():
     # https://schedule.readthedocs.io/en/stable/
-    schedule.every(5).seconds.do(job)
-    schedule.every(2).seconds.do(job)
+    schedule.every().day.at('06:00', 'Asia/Jakarta')
     while True:
         schedule.run_pending()
         sleep(1)
 
-# thread = threading.Thread(target=scheduled_task)
-# thread.daemon = True
-# thread.start()
+thread = threading.Thread(target=scheduled_task)
+thread.daemon = True
+thread.start()

@@ -3,16 +3,15 @@ Port application from [seanmcapp](https://github.com/bayusuryadana/seanmcapp)
 
 ## Todo
 - HTML Parser (move news module)
------
-- storage (only used by photos)
-- joda time/epoch (only used by photos & caches)
-- discord client
+
 
 ## Feature
 WIP
 - ~~API: telegram webhook~~
 - ~~Web: Mamen, Dota, Wallet app~~
-- ~~Scheduler: Birthday, DotaMetadata, News, (broken: Instagram, Instastory, Twitter)~~
+- ~~Scheduler:~~ Birthday, ~~DotaMetadata, News~~
+
+- deprecated: Instagram, Instastory, Twitter
 
 ## Setup
 python:

@@ -1,4 +1,3 @@
-from configparser import ConfigParser
 import psycopg2, os
 from functools import lru_cache
 from psycopg2.extras import RealDictCursor
@@ -38,7 +37,6 @@ class Database:
             telegram_send_message(telegram_private_chat_id, 'Tomorrow is ' + p['name'] + '\'s birthday !!')
         for p in birthday_next_week:
             telegram_send_message(telegram_private_chat_id, 'Next week is ' + p['name'] + '\'s birthday !!')
-        return birthday_today
 
 
         
