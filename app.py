@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from flask import Flask, render_template
 from time import sleep
 import threading, configparser, atexit, schedule
+from util import *
 
 class App:
     def __init__(self):
@@ -34,7 +35,7 @@ def api(path):
         case 'person':
             return app.db.scheduled_birthday()
         case 'time':
-            return 
+            return str(get_current_time())
         case _:
             return 'API'
 

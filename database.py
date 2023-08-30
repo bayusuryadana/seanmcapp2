@@ -2,8 +2,9 @@ from configparser import ConfigParser
 import psycopg2, os
 from functools import lru_cache
 from psycopg2.extras import RealDictCursor
-from datetime import date, timedelta
+from datetime import timedelta
 from external import *
+from util import *
 
 class Database:
     def __init__(self):
@@ -22,14 +23,15 @@ class Database:
     def scheduled_birthday(self):
         self.cursor.execute("SELECT * FROM people")
         people = self.cursor.fetchall()
-        today = date.today()
+        
+        today = get_current_time()
         tomorrow = today + timedelta(days=1)
         next_week = today + timedelta(days=7)
 
         birthday_today = [x for x in people if x['day'] == today.day and x['month'] == today.month]
         birthday_tomorrow = [x for x in people if x["day"] == tomorrow and x['month'] == tomorrow.month]
         birthday_next_week = [x for x in people if x["day"] == next_week and x['month'] ==  next_week.month]
-
+        
         for p in birthday_today:
             telegram_send_message(telegram_private_chat_id, 'Today is ' + p['name'] + '\'s birthday !!')
         for p in birthday_tomorrow:
