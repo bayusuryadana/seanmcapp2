@@ -1,6 +1,5 @@
 import requests, json, os, urllib.parse
 
-telegram_bot_name = os.environ['TELEGRAM_BOT_NAME']
 telegram_bot_endpoint = os.environ['TELEGRAM_BOT_ENDPOINT']
 telegram_private_chat_id = 274852283
 
