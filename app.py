@@ -9,9 +9,7 @@ import threading, configparser, atexit, schedule
 class App:
     def __init__(self):
         load_dotenv() # development use only
-        cfg = configparser.ConfigParser()
-        cfg.read('app.ini')
-        self.db = Database(cfg)
+        self.db = Database()
     
 app = App()
 
@@ -34,7 +32,9 @@ def api(path):
         case 'dota':
             return fetch()
         case 'person':
-            return app.db.get_people()
+            return app.db.scheduled_birthday()
+        case 'time':
+            return 
         case _:
             return 'API'
 
@@ -53,6 +53,6 @@ def scheduled_task():
         schedule.run_pending()
         sleep(1)
 
-thread = threading.Thread(target=scheduled_task)
-thread.daemon = True
-thread.start()
+# thread = threading.Thread(target=scheduled_task)
+# thread.daemon = True
+# thread.start()
