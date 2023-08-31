@@ -7,7 +7,7 @@ Port application from [seanmcapp](https://github.com/bayusuryadana/seanmcapp)
 
 ## Feature
 WIP
-- ~~API: telegram webhook~~
+- ~~API: ~~ Mamen, ~~telegram webhook~~
 - ~~Web: Mamen, Dota, Wallet app~~
 - ~~Scheduler:~~ Birthday, ~~DotaMetadata, News~~
 

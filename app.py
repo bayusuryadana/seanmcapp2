@@ -1,7 +1,6 @@
 from database import Database
-from external import fetch
 from dotenv import load_dotenv
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from time import sleep
 import threading, atexit, schedule
 from util import *
@@ -22,11 +21,19 @@ atexit.register(cleanup)
 
 app = Flask(__name__, static_folder='__templates__/static', template_folder='__templates__')
 
-@app.route('/api/<path:path>')
+@app.route('/api/<path:path>', methods = ['POST', 'GET'])
 def api(path):
     match path:
-        case 'dota':
-            return fetch()
+        case 'mamen':
+            if request.method == 'POST':
+                result = db.mamen_search(MamenRequest(request.get_json()))
+                return app.response_class(
+                    response=GenericResponse(data=result).toJson(),
+                    status=200,
+                    mimetype='application/json'
+                )
+            # else:
+                # return db.mamen_fetch_lat_lng()
         case _:
             return 'API'
 
@@ -34,6 +41,14 @@ def api(path):
 @app.route('/<path:path>')
 def index(path):
     return render_template('index.html')
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    return app.response_class(
+        response=GenericResponse(error=str(e)).toJson(),
+        status=500,
+        mimetype='application/json'
+    )
 
 ############### scheduled task starts here ###############
 
