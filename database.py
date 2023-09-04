@@ -65,7 +65,7 @@ class Database:
         for stall in filtered_stalls:
             sanitized_plus_code = urllib.parse.quote(stall['plus_code'])
             url = 'https://maps.googleapis.com/maps/api/geocode/json?key=' + google_api_key + '&address=' + sanitized_plus_code
-            response = json.loads(requests.get(url).text)
+            response = json.loads(_request(url))
             lat = response['results'][0]['geometry']['location']['lat']
             lng = response['results'][0]['geometry']['location']['lng']
             self.cursor.execute("UPDATE stalls SET latitude = %s, longitude = %s WHERE id = %s", (lat, lng, stall['id']))
@@ -75,14 +75,29 @@ class Database:
 
 ########## util in this package ##########
 
+def _request(url):
+    # https://saturncloud.io/blog/how-to-bypass-cloudflare-with-python-on-get-requests/
+    # https://saturncloud.io/blog/how-to-fix-python-requests-being-blocked-by-cloudflare/
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+    }
+    return requests.get(url, headers=headers).text
+
 def _telegram_send_message(chat_id, text):
     sanitized_text = urllib.parse.quote(text)
     query_url = telegram_bot_endpoint + '/sendmessage?chat_id=' + str(chat_id) + '&text=' + sanitized_text + '&parse_mode=markdown&disable_web_page_preview=true&disable_notification=true'
-    response = requests.get(query_url)
+    response = _request(query_url)
     print('[INFO] send message to chat_id: ' + str(chat_id) + ' with text: ' + sanitized_text)
     return response
 
-def fetch():
-    response = requests.get('http://seanmcapp.herokuapp.com/api/news').text
-    return json.loads(response)
-    
+def scheduled_news():
+    news_list = [Detik, Tirtol, Kumparan, Mothership, CNA]
+    message = 'Awali harimu dengan berita \U0001f4f0 dari **Seanmctoday** by @seanmcbot\n\n'
+    for news in news_list:
+        try:        
+            html = _request(news.url)
+            title, url = news.parse(html)
+            message += news.flag + ' ' + news.name + ' - [' + title + '](' + url + ')\n\n'
+        except Exception as e:
+            print(news.name + ': ' + str(e))
+    _telegram_send_message(telegram_private_chat_id, message)

@@ -1,4 +1,4 @@
-from database import Database
+from database import Database, scheduled_news
 from dotenv import load_dotenv
 from flask import Flask, render_template, request
 from time import sleep
@@ -34,6 +34,9 @@ def api(path):
                 )
             # else:
                 # return db.mamen_fetch_lat_lng()
+        # case 'news':
+        #     scheduled_news()
+        #     return 'done'
         case _:
             return 'API'
 
@@ -54,7 +57,11 @@ def handle_exception(e):
 
 def scheduled_task():
     # https://schedule.readthedocs.io/en/stable/
-    schedule.every().day.at('06:00', 'Asia/Jakarta')
+    schedule.every().day.at('06:00', 'Asia/Jakarta').do(db.scheduled_birthday)
+    schedule.every().day.at('08:00', 'Asia/Jakarta').do(scheduled_news)
+    # all_jobs = schedule.get_jobs()
+    # for j in all_jobs:
+    #     print(j.next_run)
     while True:
         schedule.run_pending()
         sleep(1)

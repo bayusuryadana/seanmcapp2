@@ -4,14 +4,35 @@ Port application from [seanmcapp](https://github.com/bayusuryadana/seanmcapp)
 ## Todo
 - HTML Parser (move news module)
 
+## Feature (WIP)
+done:
+	birthday
+	mamen
+	news
 
-## Feature
-WIP
-- ~~API: ~~ Mamen, ~~telegram webhook~~
-- ~~Web: Mamen, Dota, Wallet app~~
-- ~~Scheduler:~~ Birthday, ~~DotaMetadata, News~~
+high-prio:
+	wallet
+	dota
+	init+home(web)
+	wallet(web)
+	mamen(web)
+	dota(web)
 
-- deprecated: Instagram, Instastory, Twitter
+
+low-prio:
+	twitter
+	instagram
+	stalker
+	stalker special
+	cachecleaner
+	
+	blog(api + web)?
+
+	hadith
+	telegram webhook
+
+deprecated:
+	cbc
 
 ## Setup
 python:
