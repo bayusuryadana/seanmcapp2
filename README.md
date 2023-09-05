@@ -9,9 +9,10 @@ done:
 	birthday
 	mamen
 	news
+	wallet
 
 high-prio:
-	wallet
+	wallet: dashboard: pie?
 	dota
 	init+home(web)
 	wallet(web)

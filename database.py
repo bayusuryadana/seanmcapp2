@@ -39,20 +39,127 @@ class Database:
             _telegram_send_message(telegram_private_chat_id, 'Next week is ' + p['name'] + '\'s birthday !!')
 
     def mamen_search(self, request: MamenRequest):
-        self.cursor.execute("SELECT * FROM stalls")
+        self.cursor.execute("""SELECT * FROM stalls
+                            WHERE (name ILIKE %(name)s OR %(name)s IS NULL)
+                            AND (city_id = %(city_id)s OR %(city_id)s IS NULL)
+                            AND (
+                                (latitude IS NOT NULL AND longitude IS NOT NULL 
+                                AND latitude <= %(nw_lat)s AND latitude >= %(se_lat)s
+                                AND longitude <= %(nw_lng)s AND longitude >= %(se_lng)s)
+                                OR
+                                (%(nw_lat)s IS NULL OR %(se_lat)s IS NULL OR %(nw_lng)s IS NULL OR %(se_lng)s IS NULL)
+                            )
+                            """, {
+                                "name": f'%{request.name}%' if request.name else None, 
+                                "city_id": request.city_id, 
+                                "nw_lat": request.geo['nw']['lat'] if request.geo else None,
+                                "se_lat": request.geo['se']['lat'] if request.geo else None,
+                                "nw_lng": request.geo['nw']['lng'] if request.geo else None,
+                                "se_lng": request.geo['se']['lng'] if request.geo else None,
+                            })
         stalls = self.cursor.fetchall()
-        if request.name is not None:
-            stalls = [s for s in stalls if re.search(request.name, s['name'])]
-        if request.city_id is not None:
-            stalls = [s for s in stalls if request.city_id == s['city_id']]
-        if request.geo is not None:
-            nw = request.geo.nw
-            se = request.geo.se
-            stalls = [s for s in stalls 
-                    if (s['latitude'] is not None) and (s['longitude'] is not None) and 
-                    (s['latitude'] <= nw['lat']) and (s['latitude'] >= se['lat']) and
-                    (s['longitude'] <= nw['lng']) and (s['longitude'] >= se['lng'])]
         return stalls
+    
+    def _wallet_get_saving_account(self, date=None):
+        done = True if date is None else None
+        query = """SELECT SUM(amount) FROM wallets 
+                            WHERE account = %(account)s
+                            AND (done = %(done)s OR %(done)s IS NULL) 
+                            AND (date <= %(date)s OR %(date)s IS NULL)"""
+        self.cursor.execute(query, {"account": "DBS", "done": done, "date": date})
+        dbs = self.cursor.fetchall()[0]['sum']
+        self.cursor.execute(query, {"account": "BCA", "done": done, "date": date})
+        bca = self.cursor.fetchall()[0]['sum']
+        return dbs, bca
+    
+    def wallet_dashboard(self, date):
+        def _simplified_result(wallet_data):
+            result = {}
+            for w in wallet_data:
+                result[w['category']] = w['sum']
+            return result
+
+        balance_query = """SELECT date as category, SUM(monthly_expenses::int) OVER (PARTITION BY account ORDER BY date) AS sum FROM (
+                                SELECT date, account, SUM(amount) as monthly_expenses FROM wallets 
+                                WHERE date <= %(date)s AND account = %(account)s GROUP BY date, account
+                            ) as w1 ORDER BY date desc LIMIT 12"""
+        self.cursor.execute(balance_query, {"account": "DBS", "date": date})
+        balance = _simplified_result(self.cursor.fetchall())
+
+        expenses_query = """SELECT category, sum(-amount) FROM wallets WHERE (date / 100) = %(truncated_date)s AND done = true AND account = 'DBS' 
+                            AND category NOT IN ('Bonus', 'ROI', 'Salary', 'Temp', 'Transfer') GROUP BY category"""
+        self.cursor.execute(expenses_query, {"truncated_date": int(date) // 100})
+        last_year_expenses = _simplified_result(self.cursor.fetchall())
+
+        self.cursor.execute(expenses_query, {"truncated_date": (int(date) // 100) - 1})
+        ytd_expenses = _simplified_result(self.cursor.fetchall())
+
+        dbs, bca = self._wallet_get_saving_account()
+
+        return {
+            "chart": {
+                "balance": balance,
+                "last_year_expenses": last_year_expenses,
+                "ytd_expenses": ytd_expenses, 
+                "pie": "not yet implemented!"
+            },
+            "dbs": dbs,
+            "bca": bca
+        }
+
+    def wallet_data(self, date):
+        self.cursor.execute("SELECT * FROM wallets WHERE date=%s", (date,))
+        this_month_data = self.cursor.fetchall()
+        dbs, bca = self._wallet_get_saving_account()
+        planned_sgd, planned_idr = self._wallet_get_saving_account(date)
+        return {
+            "data": this_month_data,
+            "dbs": dbs,
+            "bca": bca,
+            "planned": {
+                "sgd": planned_sgd,
+                "idr": planned_idr
+            }
+        }
+    
+    def wallet_create(self, wallet: Wallet):
+        query = """INSERT INTO wallets (id, date, name, category, currency, amount, done, account) 
+                    VALUES (DEFAULT, %s, %s, %s, %s, %s, %s, %s)
+                    RETURNING id"""
+        data = (wallet.date, wallet.name, wallet.category, wallet.currency, wallet.amount, wallet.done, wallet.account)
+        try: 
+            self.cursor.execute(query, data) 
+            id_new_row = self.cursor.fetchone()
+            self.conn.commit()
+        except Exception as e: 
+            self.conn.rollback()
+            raise e
+        return id_new_row
+    
+    def wallet_update(self, wallet: Wallet):
+        if (wallet.id is None): raise AttributeError('id not found')
+        query = """UPDATE wallets SET date=%s, name=%s, category=%s, currency=%s, amount=%s, done=%s, account=%s WHERE id = %s"""
+        data = (wallet.date, wallet.name, wallet.category, wallet.currency, wallet.amount, wallet.done, wallet.account, wallet.id)
+        try: 
+            self.cursor.execute(query, data) 
+            is_success = self.cursor.rowcount
+            self.conn.commit()
+        except Exception as e: 
+            self.conn.rollback()
+            raise e
+        return is_success
+    
+    def wallet_delete(self, id):
+        query = """DELETE FROM wallets WHERE id=%s"""
+        data = (id,)
+        try:
+            self.cursor.execute(query, data)
+            is_success = self.cursor.rowcount
+            self.conn.commit()
+        except Exception as e: 
+            self.conn.rollback()
+            raise e
+        return is_success
 
     ########## reserved function area ##########
 

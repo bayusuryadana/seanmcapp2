@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 
 telegram_bot_endpoint = os.environ['TELEGRAM_BOT_ENDPOINT']
 telegram_private_chat_id = 274852283
+wallet_password = os.environ['WALLET_PASSWORD']
 
 # region city enum
 city_dict = {

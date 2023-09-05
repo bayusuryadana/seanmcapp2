@@ -1,7 +1,7 @@
 from datetime import datetime
 import pytz, json
 
-############### request data structure ###############
+############### data structure ###############
 class MamenRequest:
 
     name = None
@@ -10,16 +10,9 @@ class MamenRequest:
 
     def __init__(self, json):
         filter = json['filter']
-        if filter.get('name') is not None:
-            self.name = filter['name']
-        if filter.get('cityId') is not None:
-            self.city_id = filter['cityId']
-        if filter.get('geo') is not None:
-            self.geo = filter['geo']
-            if self.geo.get('nw'):
-                self.geo.nw = self.geo['nw']
-            if self.geo.get('se'):
-                self.geo.se = self.geo['se']
+        self.name = filter['name'] if filter.get('name') else None
+        self.city_id = filter['city_id'] if filter.get('city_id') else None
+        self.geo = filter['geo'] if filter.get('geo') else None
 
 class GenericResponse:
     data = None
@@ -35,6 +28,27 @@ class GenericResponse:
             return json.dumps({"data": self.data})
         else:
             return json.dumps({"error": self.error})
+        
+class Wallet:
+    date: int = None
+
+    id: int = None
+    name: str = None
+    category: str = None
+    currency: str = None
+    amount: int = None
+    done: bool = None
+    account: str = None
+
+    def __init__(self, json):
+        self.date = json['date']
+        self.id = json['id'] if json.get('id') is not None else None
+        self.name = json['name']
+        self.category = json['category']
+        self.currency = json['currency']
+        self.amount = json['amount']
+        self.done = json['done']
+        self.account = json['account']
 
 ############### util function ###############
 def get_current_time():
