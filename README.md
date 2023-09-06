@@ -6,34 +6,31 @@ Port application from [seanmcapp](https://github.com/bayusuryadana/seanmcapp)
 
 ## Feature (WIP)
 done:
-	birthday
-	mamen
-	news
-	wallet
+	api:
+		mamen
+		news
+		wallet
+	scheduler:
+		instagram
+		birthday
+	web:
 
 high-prio:
-	wallet: dashboard: pie?
-	dota
-	init+home(web)
+	instagram + twitter (logged in) -> cache cleaner
+	home(web)
 	wallet(web)
 	mamen(web)
-	dota(web)
-
-
-low-prio:
-	twitter
-	instagram
-	stalker
-	stalker special
-	cachecleaner
-	
 	blog(api + web)?
 
-	hadith
-	telegram webhook
+low-prio:
+	wallet: dashboard: pie?
 
 deprecated:
 	cbc
+	dota + dota(web)
+	hadith
+	telegram webhook
+	discord
 
 ## Setup
 python:

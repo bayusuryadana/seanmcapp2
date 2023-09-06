@@ -160,6 +160,63 @@ class Database:
             self.conn.rollback()
             raise e
         return is_success
+    
+    def instagram(self):
+        self.cursor.execute("SELECT * FROM accounts WHERE group_type = 2")
+        accounts = self.cursor.fetchall()
+        
+        # https://medium.com/@harshgolu82/scraping-instagram-using-python-and-scrapy-%EF%B8%8F-ca4af5ed4dc1
+        # image fetched min = 4 (should be 6 to be save from pinned), max= 63
+        headers = {
+            "x-asbd-id": '198387',
+            "x-csrftoken": "gqeYY9dr1dCwfvtyZCgy88tcMn1A2N85",
+            "x-ig-app-id": '936619743392459',
+            "x-requested-with": "XMLHttpRequest"
+        }
+
+        result = []
+        for acc in accounts:
+            id = acc['id']
+            username = acc['alias']
+            print(f'{id}:{username}')
+            response = requests.get(f'https://www.instagram.com/api/v1/feed/user/{id}/?count=6&max_id=', headers = headers)
+            if (response.status_code != 200):
+                response = requests.get(f'https://www.instagram.com/api/v1/feed/user/{username}/username/?count=6&max_id=', headers = headers)
+            json_response = json.loads(response.text)
+            items = json_response['items']
+            # next_max_id = json_response['next_max_id']
+
+            self.cursor.execute('SELECT * FROM caches WHERE account_id = %s', (id, ))
+            cache = self.cursor.fetchone()
+            cache_value_set = set(cache['value'].split(',')) if cache is not None and cache.get('value') is not None else []
+            new_pk_list = [i['pk'] for i in items]
+            diff_set = set([x for x in new_pk_list if x not in cache_value_set])
+
+            items_diff = [x for x in items if x['pk'] in diff_set]
+            for item in items_diff:
+                display_url = item['image_versions2']['candidates'][0]['url']
+                caption = (item['caption']['text'] if item.get('caption') is not None else '')
+                _telegram_send_photo_with_caption(telegram_private_chat_id, f'<b>{username}</b> {caption}', display_url)
+
+            new_cache_value = ''
+            for d in new_pk_list[:-1]:
+                new_cache_value += d + ','
+            else:
+                new_cache_value += new_pk_list[-1]
+            
+            if cache is None:
+                self.cursor.execute("INSERT INTO caches VALUES ('instapost', %s, NULL, %s)", (new_cache_value, id))
+            else:
+                self.cursor.execute("UPDATE caches SET value = %s WHERE account_id = %s", (new_cache_value, id))
+            self.conn.commit()
+
+            result.append({
+                "username": username,
+                "new_pk_list": list(map(str, diff_set))
+            })
+        
+        return result
+
 
     ########## reserved function area ##########
 
@@ -195,6 +252,14 @@ def _telegram_send_message(chat_id, text):
     query_url = telegram_bot_endpoint + '/sendmessage?chat_id=' + str(chat_id) + '&text=' + sanitized_text + '&parse_mode=markdown&disable_web_page_preview=true&disable_notification=true'
     response = _request(query_url)
     print('[INFO] send message to chat_id: ' + str(chat_id) + ' with text: ' + sanitized_text)
+    return response
+
+def _telegram_send_photo_with_caption(chat_id, caption, display_url):
+    sanitized_caption = urllib.parse.quote(caption)
+    sanitized_display_url = urllib.parse.quote(display_url)
+    query_url = f'{telegram_bot_endpoint}/sendphoto?chat_id={chat_id}&photo={sanitized_display_url}&caption={sanitized_caption}&parse_mode=html'
+    response = _request(query_url)
+    print(f'[INFO] send photo to chat_id: {chat_id} with caption: {caption}')
     return response
 
 def scheduled_news():

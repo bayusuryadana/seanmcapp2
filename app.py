@@ -63,6 +63,10 @@ def api(path):
             if request.method == 'POST':
                 result = db.mamen_search(MamenRequest(request.get_json()))
                 return success_handler(result)
+        # case 'instagram':
+        #     if request.method == 'GET':
+        #         result = db.instagram()
+        #         return success_handler(result)
             # else:
                 # return db.mamen_fetch_lat_lng()
         # case 'news':
@@ -102,6 +106,7 @@ def scheduled_task():
     # https://schedule.readthedocs.io/en/stable/
     schedule.every().day.at('06:00', 'Asia/Jakarta').do(db.scheduled_birthday)
     schedule.every().day.at('08:00', 'Asia/Jakarta').do(scheduled_news)
+    schedule.every().day.at('20:00', 'Asia/Singapore').do(db.instagram)
     # all_jobs = schedule.get_jobs()
     # for j in all_jobs:
     #     print(j.next_run)
