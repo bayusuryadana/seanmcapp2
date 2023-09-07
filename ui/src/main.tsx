@@ -7,7 +7,11 @@ import {
   RouterProvider,
 } from "react-router-dom"
 import { Mamen } from './Mamen.tsx'
-import { Wallet } from './Wallet.tsx'
+import { Wallet } from './wallet/Wallet.tsx'
+import { WalletLogin } from './wallet/WalletLogin.tsx'
+import { createContext } from 'react'
+
+export const UserContext = createContext(null);
 
 const router = createBrowserRouter([
   {
@@ -17,6 +21,10 @@ const router = createBrowserRouter([
   {
     path: "/mamen",
     element: <Mamen />
+  },
+  {
+    path: "/wallet/login",
+    element: <WalletLogin />
   },
   {
     path: "/wallet",
