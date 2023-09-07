@@ -1,12 +1,10 @@
 import { Container } from "@mui/material"
 
 
-function Mamen() {
+export const Mamen = () => {
     return (
         <>
             <Container>Mamen Page</Container>
         </>
     )
 }
-
-export default Mamen

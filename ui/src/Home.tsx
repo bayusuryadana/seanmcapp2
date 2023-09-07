@@ -1,33 +1,34 @@
 import { useNavigate } from "react-router-dom";
 import { Container, Grid, Button } from "@mui/material";
 
+export const Home = () => {
 
-function Home() {
-
-  let navigate = useNavigate()
-  const routeChange = () => { navigate('/wallet') }
+  const navigate = useNavigate()
+  const routeChange = (path: string) => {
+    navigate(path)
+  }
 
   return (
-    <>
-        <Container maxWidth="sm">
-            <p>SEANMCAPP</p>
-                <Grid container spacing={3}>
-                    <Grid item xs={3}>
-                        <Button variant="text"></Button>
+    <div id="wrapper">
+        <div id="home-container">
+            <Container maxWidth="sm">
+                <h1>SEANMCAPP</h1>
+                    <Grid container spacing={3}>
+                        <Grid item xs={3}>
+                            <Button variant="text"></Button>
+                        </Grid>
+                        <Grid item xs={3}>
+                            <Button variant="outlined" onClick={() => routeChange('/wallet')}>Wallet</Button>
+                        </Grid>
+                        <Grid item xs={3}>
+                            <Button variant="outlined" onClick={() => routeChange('/mamen')}>Mamen</Button>
+                        </Grid>
+                        <Grid item xs={3}>
+                            <Button variant="text"></Button>
+                        </Grid>
                     </Grid>
-                    <Grid item xs={3}>
-                        <Button variant="outlined" onClick={routeChange}>Wallet</Button>
-                    </Grid>
-                    <Grid item xs={3}>
-                        <Button variant="outlined">Mamen</Button>
-                    </Grid>
-                    <Grid item xs={3}>
-                        <Button variant="text"></Button>
-                    </Grid>
-                </Grid>
-        </Container>
-    </>
+            </Container>
+        </div>
+    </div>
   )
 }
-
-export default Home
