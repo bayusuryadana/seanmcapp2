@@ -95,6 +95,10 @@ class Database:
         ytd_expenses = _simplified_result(self.cursor.fetchall())
 
         dbs, bca = self._wallet_get_saving_account()
+        planned_sgd, planned_idr = self._wallet_get_saving_account(date)
+
+        self.cursor.execute("SELECT * FROM wallets WHERE date=%s", (date,))
+        this_month_data = self.cursor.fetchall()
 
         return {
             "chart": {
@@ -103,23 +107,15 @@ class Database:
                 "ytd_expenses": ytd_expenses, 
                 "pie": "not yet implemented!"
             },
-            "dbs": dbs,
-            "bca": bca
-        }
-
-    def wallet_data(self, date):
-        self.cursor.execute("SELECT * FROM wallets WHERE date=%s", (date,))
-        this_month_data = self.cursor.fetchall()
-        dbs, bca = self._wallet_get_saving_account()
-        planned_sgd, planned_idr = self._wallet_get_saving_account(date)
-        return {
-            "data": this_month_data,
-            "dbs": dbs,
-            "bca": bca,
+            "savings": {
+                "dbs": dbs,
+                "bca": bca,
+            },
             "planned": {
                 "sgd": planned_sgd,
                 "idr": planned_idr
-            }
+            },
+            "detail": this_month_data,
         }
     
     def wallet_create(self, wallet: Wallet):

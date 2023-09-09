@@ -32,12 +32,12 @@ export const WalletLogin = (_props: any) => {
         password: inputPassword
       }
     })
-    .then(function (response) {
+    .then((response) => {
       console.log(response);
       setDisplay({ display: 'none' })
       savePassword(inputPassword)
     })
-    .catch(function (error) {
+    .catch((error) => {
       console.log(error);
       setDisplay({ display: 'true'})
       if (error.response && error.response.status == 404) {

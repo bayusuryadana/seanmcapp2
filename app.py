@@ -39,10 +39,6 @@ def wallet_get_auth(path):
                     date = request.args.get('date')
                     response = db.wallet_dashboard(date)
                     return success_handler(response)
-                case 'data':
-                    date = request.args.get('date')
-                    response = db.wallet_data(date)
-                    return success_handler(response)
         case 'POST':
             match path:
                 case 'login':

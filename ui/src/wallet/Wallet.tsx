@@ -26,10 +26,12 @@ import { defaultTheme } from './constant';
 import { useContext } from 'react';
 import { Navigate } from 'react-router-dom';
 import { UserContext, UserContextType } from './UserContext';
+import axios from 'axios';
 
-export const Wallet = (_props: any) => {
+export const Wallet = () => {
     const { userContext, savePassword } = useContext(UserContext) as UserContextType;
     const [open, setOpen] = React.useState(false);
+    // const [data, setData] = React.useState(null);
     const toggleDrawer = () => {
       setOpen(!open);
     };
@@ -37,6 +39,20 @@ export const Wallet = (_props: any) => {
     const logoutHandler = () => {
       savePassword(null)
     }
+
+    const date = new Date()
+    const dateString = date.getFullYear().toString() + ('0' + (date.getMonth() + 1).toString()).slice(-2)
+    axios.get('api/wallet/dashboard', {
+      params: {
+        date: dateString
+      },
+      auth: {
+        username: 'bayu',
+        password: userContext ?? ""
+      }
+    })
+    .then((response) => {console.log(response)})
+    .catch((error) => {console.log(error)})
 
     if (userContext != null) {
       return (
