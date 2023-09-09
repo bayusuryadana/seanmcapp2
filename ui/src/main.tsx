@@ -9,9 +9,7 @@ import {
 import { Mamen } from './Mamen.tsx'
 import { Wallet } from './wallet/Wallet.tsx'
 import { WalletLogin } from './wallet/WalletLogin.tsx'
-import { createContext } from 'react'
-
-export const UserContext = createContext(null);
+import { UserProvider } from './wallet/UserContext.tsx'
 
 const router = createBrowserRouter([
   {
@@ -34,6 +32,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+      <UserProvider>
+        <RouterProvider router={router} />
+      </UserProvider>
   </React.StrictMode>,
 )

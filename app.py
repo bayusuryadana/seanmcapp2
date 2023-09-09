@@ -45,6 +45,8 @@ def wallet_get_auth(path):
                     return success_handler(response)
         case 'POST':
             match path:
+                case 'login':
+                    return success_handler({"message": "Success."})
                 case 'create':
                     response = db.wallet_create(Wallet(request.get_json()))
                     return success_handler(response)
@@ -99,6 +101,18 @@ def handle_exception(e):
 def verify_password(username, password):
     if username in users and check_password_hash(users.get(username), password):
         return username
+    return None 
+    
+@auth.error_handler
+def auth_error():
+    error_message = {
+        "message": "Access Denied."
+    }
+    return app.response_class(
+        response=GenericResponse(error=error_message).toJson(),
+        status=403,
+        mimetype='application/json'
+    )
 
 ############### scheduled task starts here ###############
 

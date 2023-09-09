@@ -13,7 +13,7 @@ import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import NotificationsIcon from '@mui/icons-material/Notifications';
+import LogoutIcon from '@mui/icons-material/Logout';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
@@ -23,19 +23,23 @@ import { AppBar } from './AppBar';
 import { Drawer } from './Drawer';
 import Chart from './Chart';
 import { defaultTheme } from './constant';
-import { UserContext } from '../main';
 import { useContext } from 'react';
+import { Navigate } from 'react-router-dom';
+import { UserContext, UserContextType } from './UserContext';
 
-export const Wallet = () => {
-    const userContext = useContext(UserContext);
+export const Wallet = (_props: any) => {
+    const { userContext, savePassword } = useContext(UserContext) as UserContextType;
     const [open, setOpen] = React.useState(false);
     const toggleDrawer = () => {
       setOpen(!open);
     };
 
-    console.log("kontol" + userContext)
+    const logoutHandler = () => {
+      savePassword(null)
+    }
 
-    return (
+    if (userContext != null) {
+      return (
         <ThemeProvider theme={defaultTheme}>
           <Box sx={{ display: 'flex' }}>
             <CssBaseline />
@@ -47,9 +51,9 @@ export const Wallet = () => {
                 <Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
                   Seanmcwallet
                 </Typography>
-                <IconButton color="inherit">
+                <IconButton color="inherit" onClick={logoutHandler}>
                   <Badge color="secondary">
-                    <NotificationsIcon />
+                    <LogoutIcon />
                   </Badge>
                 </IconButton>
               </Toolbar>
@@ -111,4 +115,7 @@ export const Wallet = () => {
           </Box>
         </ThemeProvider>
       );
+    } else {
+      return <Navigate to="/wallet/login" />
+    }
 }
