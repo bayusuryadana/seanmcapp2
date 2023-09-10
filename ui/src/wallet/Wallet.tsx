@@ -27,11 +27,16 @@ import { useContext } from 'react';
 import { Navigate } from 'react-router-dom';
 import { UserContext, UserContextType } from './UserContext';
 import axios from 'axios';
+import { WalletDashboardData } from './WalletModels';
+import Alert from '@mui/material/Alert';
+import { SeanmcappResponse } from '../CommonModels';
+import { Title } from './Title';
 
 export const Wallet = () => {
     const { userContext, savePassword } = useContext(UserContext) as UserContextType;
     const [open, setOpen] = React.useState(false);
-    // const [data, setData] = React.useState(null);
+    const [display, setDisplay] = React.useState({ display: 'none' })
+    const [data, setData] = React.useState<WalletDashboardData|null>(null);
     const toggleDrawer = () => {
       setOpen(!open);
     };
@@ -40,19 +45,28 @@ export const Wallet = () => {
       savePassword(null)
     }
 
-    const date = new Date()
-    const dateString = date.getFullYear().toString() + ('0' + (date.getMonth() + 1).toString()).slice(-2)
-    axios.get('api/wallet/dashboard', {
-      params: {
-        date: dateString
-      },
-      auth: {
-        username: 'bayu',
-        password: userContext ?? ""
-      }
-    })
-    .then((response) => {console.log(response)})
-    .catch((error) => {console.log(error)})
+    React.useEffect(() => {
+      const date = new Date()
+      const dateString = date.getFullYear().toString() + ('0' + (date.getMonth() + 1).toString()).slice(-2)
+      axios.get('api/wallet/dashboard', {
+        params: {
+          date: dateString
+        },
+        auth: {
+          username: 'bayu',
+          password: userContext ?? ""
+        }
+      })
+      .then((response) => {
+        setDisplay({ display: 'none'})
+        const apiData: SeanmcappResponse<WalletDashboardData> = response.data
+        setData(apiData.data)
+      })
+      .catch((error) => {
+        console.log(error)
+        setDisplay({ display: 'true'})
+      })
+    }, [])
 
     if (userContext != null) {
       return (
@@ -108,6 +122,7 @@ export const Wallet = () => {
             >
               <Toolbar />
               <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+                <Alert id="invalid-data-alert" severity="error" sx={display}>Data failed to fetch/parse!</Alert>
                 <Grid container spacing={3}>
                   {/* Balance */}
                   <Grid item xs={12} md={8} lg={9}>
@@ -118,11 +133,19 @@ export const Wallet = () => {
                   {/* Saving accounts */}
                   <Grid item xs={12} md={4} lg={3}>
                     <Paper sx={{p: 2, display: 'flex', flexDirection: 'column', height: 240, }}>
+                    <Title>Recent Deposits</Title>
+                    <Typography component="p" variant="h5">
+                      S$ 3,024
+                    </Typography>
+                    <Typography component="p" variant="h5">
+                      Rp. 13,002,400
+                    </Typography>
                     </Paper>
                   </Grid>
                   {/* Data */}
                   <Grid item xs={12}>
                     <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+                      <Typography>{data?.chart.pie}</Typography>
                     </Paper>
                   </Grid>
                 </Grid>

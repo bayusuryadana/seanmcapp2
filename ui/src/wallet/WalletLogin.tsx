@@ -32,8 +32,7 @@ export const WalletLogin = (_props: any) => {
         password: inputPassword
       }
     })
-    .then((response) => {
-      console.log(response);
+    .then(() => {
       setDisplay({ display: 'none' })
       savePassword(inputPassword)
     })
