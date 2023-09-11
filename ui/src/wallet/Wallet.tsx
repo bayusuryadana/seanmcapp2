@@ -7,7 +7,6 @@ import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
-import Badge from '@mui/material/Badge';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
@@ -27,10 +26,11 @@ import { useContext } from 'react';
 import { Navigate } from 'react-router-dom';
 import { UserContext, UserContextType } from './UserContext';
 import axios from 'axios';
-import { WalletDashboardData } from './WalletModels';
+import { WalletDashboardData, WalletDetail } from './WalletModels';
 import Alert from '@mui/material/Alert';
 import { SeanmcappResponse } from '../CommonModels';
 import { Title } from './Title';
+import { Detail } from './Detail';
 
 export const Wallet = () => {
     const { userContext, savePassword } = useContext(UserContext) as UserContextType;
@@ -43,6 +43,34 @@ export const Wallet = () => {
 
     const logoutHandler = () => {
       savePassword(null)
+    }
+
+    const createHandler = (_: WalletDetail) => {
+
+    }
+
+    const editHandler = (_: WalletDetail) => {
+
+    }
+
+    const deleteHandler = (id: number) => {
+      // need modal/alert to confirm
+      // show banner
+      // re-render detail?
+      axios.post('api/wallet/delete', {id: id}, {
+        auth: {
+          username: 'bayu',
+          password: userContext ?? ""
+        }
+      }).then((response) => {
+        if (response.data.data == 'true') {
+          const index = data?.detail.findIndex((d) => d.id === id) ?? -1
+          if (index && index > -1) {
+            setData({...data, detail: data?.detail.splice(index, 1) ?? []} as WalletDashboardData)
+          }
+        }
+      })
+      .catch((error) => console.log(error))
     }
 
     React.useEffect(() => {
@@ -82,9 +110,7 @@ export const Wallet = () => {
                   Seanmcwallet
                 </Typography>
                 <IconButton color="inherit" onClick={logoutHandler}>
-                  <Badge color="secondary">
-                    <LogoutIcon />
-                  </Badge>
+                  <LogoutIcon />
                 </IconButton>
               </Toolbar>
             </AppBar>
@@ -127,25 +153,31 @@ export const Wallet = () => {
                   {/* Balance */}
                   <Grid item xs={12} md={8} lg={9}>
                     <Paper sx={{p: 2, display: 'flex', flexDirection: 'column', height: 240, }}>
-                        <Chart />
+                        <Chart data={data?.chart.balance ?? []} />
                     </Paper>
                   </Grid>
                   {/* Saving accounts */}
                   <Grid item xs={12} md={4} lg={3}>
                     <Paper sx={{p: 2, display: 'flex', flexDirection: 'column', height: 240, }}>
-                    <Title>Recent Deposits</Title>
-                    <Typography component="p" variant="h5">
-                      S$ 3,024
+                    <Title>Current Savings</Title>
+                    <Typography color="text.secondary">
+                      on DBS account
+                    </Typography>
+                    <Typography component="p" variant="h5" sx={{ flex: 0.5 }}>
+                      S$ {data?.savings.dbs.toLocaleString()}
+                    </Typography>
+                    <Typography color="text.secondary">
+                      on BCA account
                     </Typography>
                     <Typography component="p" variant="h5">
-                      Rp. 13,002,400
+                      Rp. {data?.savings.bca.toLocaleString()}
                     </Typography>
                     </Paper>
                   </Grid>
                   {/* Data */}
                   <Grid item xs={12}>
                     <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                      <Typography>{data?.chart.pie}</Typography>
+                      <Detail rows={data?.detail ?? []} createHandler={createHandler} editHandler={editHandler} deleteHandler={deleteHandler}/>
                     </Paper>
                   </Grid>
                 </Grid>

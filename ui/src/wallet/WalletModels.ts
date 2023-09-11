@@ -1,4 +1,3 @@
-
 export type WalletDashboardData = {
     chart: WalletChart;
     savings: WalletSavings;
@@ -7,10 +6,15 @@ export type WalletDashboardData = {
 }
 
 export type WalletChart = {
-    balance: Map<string, number>;
+    balance: WalletChartBalance[];
     last_year_expenses: Map<string, number>;
     ytd_expenses: Map<string, number>;
     pie: string
+}
+
+export type WalletChartBalance = {
+    date: number;
+    sum: number;
 }
 
 export type WalletSavings = {
