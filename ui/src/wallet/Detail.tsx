@@ -1,27 +1,33 @@
 import * as React from 'react';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
 import { Title } from './Title';
 import { WalletDetail } from './WalletModels';
-import IconButton from '@mui/material/IconButton';
+import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { Grid, IconButton, TableRow, TableHead, TableCell, TableBody, Table } from '@mui/material';
 
 interface DetailProps {
     rows: WalletDetail[]
     createHandler: (row: WalletDetail) => void
     editHandler: (row: WalletDetail) => void
     deleteHandler: (id: number) => void
+    onClickAddButton: () => void
 }
 
 export const Detail = (props: DetailProps) => {
 
   return (
     <React.Fragment>
-      <Title>Detail</Title>
+      <Grid container justifyContent={'space-between'}>
+        <Grid item>
+          <Title>Detail</Title>
+        </Grid>
+        <Grid item>
+          <IconButton color='primary' size='small' onClick={props.onClickAddButton}>
+            <AddIcon />
+          </IconButton>
+        </Grid>
+      </Grid>
       <Table size="small">
         <TableHead>
           <TableRow>

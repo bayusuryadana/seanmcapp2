@@ -17,7 +17,7 @@ export default function Chart(props: ChartProps) {
       <Title>Balance</Title>
       <ResponsiveContainer>
         <LineChart
-          data={props.data}
+          data={props.data.sort((a,b) => a.date-b.date)}
           margin={{
             top: 16,
             right: 16,

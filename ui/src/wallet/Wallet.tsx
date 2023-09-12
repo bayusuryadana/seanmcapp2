@@ -1,21 +1,5 @@
 import * as React from 'react';
 import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
-import MenuIcon from '@mui/icons-material/Menu';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import LogoutIcon from '@mui/icons-material/Logout';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import { AppBar } from './AppBar';
@@ -27,26 +11,26 @@ import { Navigate } from 'react-router-dom';
 import { UserContext, UserContextType } from './UserContext';
 import axios from 'axios';
 import { WalletDashboardData, WalletDetail } from './WalletModels';
-import Alert from '@mui/material/Alert';
 import { SeanmcappResponse } from '../CommonModels';
 import { Title } from './Title';
 import { Detail } from './Detail';
+import { WalletModal } from './Modal';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import LogoutIcon from '@mui/icons-material/Logout';
+import MenuIcon from '@mui/icons-material/Menu';
+import { Box, CssBaseline, Toolbar, IconButton, Typography, Divider, List, ListItemButton, ListItemIcon, ListItemText, Container, Alert, Grid, Paper } from '@mui/material';
 
 export const Wallet = () => {
     const { userContext, savePassword } = useContext(UserContext) as UserContextType;
     const [open, setOpen] = React.useState(false);
     const [display, setDisplay] = React.useState({ display: 'none' })
     const [data, setData] = React.useState<WalletDashboardData|null>(null);
-    const toggleDrawer = () => {
-      setOpen(!open);
-    };
+    const [modalOpen, setModalOpen] = React.useState(false)
 
-    const logoutHandler = () => {
-      savePassword(null)
-    }
+    const toggleDrawer = () => setOpen(!open)
 
     const createHandler = (_: WalletDetail) => {
-
+      
     }
 
     const editHandler = (_: WalletDetail) => {
@@ -98,6 +82,7 @@ export const Wallet = () => {
 
     if (userContext != null) {
       return (
+        <>
         <ThemeProvider theme={defaultTheme}>
           <Box sx={{ display: 'flex' }}>
             <CssBaseline />
@@ -109,7 +94,7 @@ export const Wallet = () => {
                 <Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
                   Seanmcwallet
                 </Typography>
-                <IconButton color="inherit" onClick={logoutHandler}>
+                <IconButton color="inherit" onClick={() => savePassword(null)}>
                   <LogoutIcon />
                 </IconButton>
               </Toolbar>
@@ -177,7 +162,13 @@ export const Wallet = () => {
                   {/* Data */}
                   <Grid item xs={12}>
                     <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                      <Detail rows={data?.detail ?? []} createHandler={createHandler} editHandler={editHandler} deleteHandler={deleteHandler}/>
+                      <Detail 
+                        rows={data?.detail ?? []} 
+                        createHandler={createHandler} 
+                        editHandler={editHandler} 
+                        deleteHandler={deleteHandler} 
+                        onClickAddButton={() => setModalOpen(true)}
+                      />
                     </Paper>
                   </Grid>
                 </Grid>
@@ -185,6 +176,14 @@ export const Wallet = () => {
             </Box>
           </Box>
         </ThemeProvider>
+
+        <WalletModal 
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          actionText='Add data'
+          handleSubmit={() => {}}
+          />
+        </>
       );
     } else {
       return <Navigate to="/wallet/login" />
