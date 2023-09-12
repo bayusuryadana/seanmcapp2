@@ -79,12 +79,12 @@ class Database:
                 result[w['category']] = w['sum']
             return result
 
-        balance_query = """SELECT date as category, SUM(monthly_expenses::int) OVER (PARTITION BY account ORDER BY date) AS sum FROM (
+        balance_query = """SELECT date, SUM(monthly_expenses::int) OVER (PARTITION BY account ORDER BY date) AS sum FROM (
                                 SELECT date, account, SUM(amount) as monthly_expenses FROM wallets 
                                 WHERE date <= %(date)s AND account = %(account)s GROUP BY date, account
                             ) as w1 ORDER BY date desc LIMIT 12"""
         self.cursor.execute(balance_query, {"account": "DBS", "date": date})
-        balance = _simplified_result(self.cursor.fetchall())
+        balance = self.cursor.fetchall()
 
         expenses_query = """SELECT category, sum(-amount) FROM wallets WHERE (date / 100) = %(truncated_date)s AND done = true AND account = 'DBS' 
                             AND category NOT IN ('Bonus', 'ROI', 'Salary', 'Temp', 'Transfer') GROUP BY category"""
