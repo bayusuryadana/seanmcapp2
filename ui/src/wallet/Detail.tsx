@@ -8,10 +8,9 @@ import { Grid, IconButton, TableRow, TableHead, TableCell, TableBody, Table } fr
 
 interface DetailProps {
     rows: WalletDetail[]
-    createHandler: (row: WalletDetail) => void
     editHandler: (row: WalletDetail) => void
     deleteHandler: (id: number) => void
-    onClickAddButton: () => void
+    createHandler: () => void
 }
 
 export const Detail = (props: DetailProps) => {
@@ -23,7 +22,7 @@ export const Detail = (props: DetailProps) => {
           <Title>Detail</Title>
         </Grid>
         <Grid item>
-          <IconButton color='primary' size='small' onClick={props.onClickAddButton}>
+          <IconButton color='primary' size='small' onClick={props.createHandler}>
             <AddIcon />
           </IconButton>
         </Grid>

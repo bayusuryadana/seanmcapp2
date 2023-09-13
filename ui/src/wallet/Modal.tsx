@@ -1,20 +1,71 @@
 import { Button, Modal, Box, Typography, Alert, TextField, MenuItem, Select, Grid, InputLabel, FormControlLabel, Checkbox } from "@mui/material";
-import React from "react";
+import axios from "axios";
+import React, { useContext } from "react";
+import { UserContext, UserContextType } from "./UserContext";
+import { WalletDetail } from "./WalletModels";
+import { modalStyle } from "./constant";
 
 interface WalletModalProps {
     open: boolean
     onClose: () => void
     actionText: string
-    handleSubmit: () => void
+    date: string
+    onSuccess: (row: WalletDetail) => void
 }
 
 export const WalletModal = (props: WalletModalProps) => {
-    const [display] = React.useState({ display: 'none' })
-    const [text] = React.useState('')
+    const { userContext } = useContext(UserContext) as UserContextType;
+
+    const [display, setDisplay] = React.useState('none')
+    // const [formData, setData] = React.useState<WalletDetail|null>(null)
 
     const [currency, setCurrency] = React.useState('')
     const [category, setCategory] = React.useState('')
     const [account, setAccount] = React.useState('')
+
+    const getAccount = (currency: string): string => {
+        if (currency === 'SGD') 
+            return 'DBS'
+        if (currency === 'IDR')
+            return 'BCA'
+        return ''
+    }
+
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault()
+        
+        const data = new FormData(event.currentTarget);
+
+        const currency = data.get('currency')?.toString() ?? ""
+        const done = data.get('done')?.toString() ? true : false
+        const payload = {
+            'id': parseInt(data.get('id')?.toString() ?? ""),
+            'date': parseInt(props.date),
+            'name': data.get('name')?.toString() ?? "",
+            'amount': parseInt(data.get('amount')?.toString() ?? ""),
+            'category': data.get('category')?.toString() ?? "",
+            'currency': currency,
+            'account': getAccount(currency),
+            'done': done
+        }
+
+        console.log(payload)
+
+        axios.post('api/wallet/create', payload, {
+            auth: {
+                username: 'bayu',
+                password: userContext ?? ""
+              }
+        }).then((response) => {
+            setDisplay('none')
+            const newData = {...payload, id: response.data.data.id}
+            props.onSuccess(newData)
+        })
+        .catch((error) => {
+            console.log(error)
+            setDisplay('true')
+        })
+    }
 
     return (
           <Modal
@@ -28,8 +79,8 @@ export const WalletModal = (props: WalletModalProps) => {
                 {props.actionText}
               </Typography>
               <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                    <Box component="form" onSubmit={props.handleSubmit} noValidate sx={{ mt: 1 }}>
-                    <Alert id="wrong-password-alert" severity="error" sx={display}>{text}</Alert>
+                  <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+                    <Alert id="wrong-password-alert" severity="error" sx={{display: display, mb: 1}}>Gagal tot!</Alert>
                     <Grid container spacing={1}>
                         <Grid item xs={12}>
                             <InputLabel>Name</InputLabel>
@@ -75,7 +126,11 @@ export const WalletModal = (props: WalletModalProps) => {
                                 label="currency"
                                 name="currency"
                                 variant="standard"
-                                onChange={(event) => setCurrency(event.target.value)}
+                                onChange={(event) => {
+                                    const curr = event.target.value
+                                    setCurrency(curr)
+                                    setAccount(getAccount(curr).toString())
+                                }}
                             >
                                 <MenuItem value={'SGD'}>SGD</MenuItem>
                                 <MenuItem value={'IDR'}>IDR</MenuItem>
@@ -83,23 +138,12 @@ export const WalletModal = (props: WalletModalProps) => {
                         </Grid>
                         <Grid item xs={6}>
                             <InputLabel>Account</InputLabel>
-                            <Select
-                                required
-                                fullWidth
-                                value={account}
-                                label="account"
-                                name="account"
-                                variant="standard"
-                                onChange={(event) => setAccount(event.target.value)}
-                            >
-                                <MenuItem value={'DBS'}>DBS</MenuItem>
-                                <MenuItem value={'BCA'}>BCA</MenuItem>
-                            </Select>
+                            <TextField required disabled fullWidth value={account} name="account" type="text" variant="standard"/>
                         </Grid>
                         <Grid item xs={12}>
                             <FormControlLabel
                                 control={<Checkbox color="secondary" name="done" value="yes" />}
-                                label="Is this transaction done?"
+                                label="Is it done?"
                             />
                         </Grid>
                     </Grid>
@@ -107,21 +151,9 @@ export const WalletModal = (props: WalletModalProps) => {
                     <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
                         Submit
                     </Button>
-                    </Box>
+                  </Box>
               </Typography>
             </Box>
           </Modal>
       );
 }
-
-const modalStyle = {
-    position: 'absolute' as 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-  };

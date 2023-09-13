@@ -24,42 +24,52 @@ export const Wallet = () => {
     const { userContext, savePassword } = useContext(UserContext) as UserContextType;
     const [open, setOpen] = React.useState(false);
     const [display, setDisplay] = React.useState({ display: 'none' })
+    const [alertText, setAlertText] = React.useState('')
     const [data, setData] = React.useState<WalletDashboardData|null>(null);
     const [modalOpen, setModalOpen] = React.useState(false)
 
     const toggleDrawer = () => setOpen(!open)
 
-    const createHandler = (_: WalletDetail) => {
-      
+    const onSuccess = (row: WalletDetail) => {
+      setModalOpen(false)
+      if (data !== null) {
+        const updatedDetail = {...data, detail: [...data.detail, row]}
+        setData(updatedDetail)
+      }
     }
 
     const editHandler = (_: WalletDetail) => {
-
+      setModalOpen(true)
     }
 
     const deleteHandler = (id: number) => {
       // need modal/alert to confirm
       // show banner
-      // re-render detail?
       axios.post('api/wallet/delete', {id: id}, {
         auth: {
           username: 'bayu',
           password: userContext ?? ""
         }
       }).then((response) => {
-        if (response.data.data == 'true') {
+        console.log(response)
+        if (response.data.data == '1') {
           const index = data?.detail.findIndex((d) => d.id === id) ?? -1
-          if (index && index > -1) {
-            setData({...data, detail: data?.detail.splice(index, 1) ?? []} as WalletDashboardData)
+          if (index && index > -1 && data) {
+            setData({...data, detail: data.detail.splice(index, 1) ?? []} as WalletDashboardData)
           }
         }
       })
-      .catch((error) => console.log(error))
+      .catch((error) => {
+        setDisplay({display: 'true'})
+        setAlertText('Failed to delete!')
+        console.log(error)
+      })
     }
 
+    const date = new Date()
+    const dateString = date.getFullYear().toString() + ('0' + (date.getMonth() + 1).toString()).slice(-2)
+
     React.useEffect(() => {
-      const date = new Date()
-      const dateString = date.getFullYear().toString() + ('0' + (date.getMonth() + 1).toString()).slice(-2)
       axios.get('api/wallet/dashboard', {
         params: {
           date: dateString
@@ -77,6 +87,7 @@ export const Wallet = () => {
       .catch((error) => {
         console.log(error)
         setDisplay({ display: 'true'})
+        setAlertText("Data failed to fetch/parse!")
       })
     }, [])
 
@@ -133,7 +144,7 @@ export const Wallet = () => {
             >
               <Toolbar />
               <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-                <Alert id="invalid-data-alert" severity="error" sx={display}>Data failed to fetch/parse!</Alert>
+                <Alert id="invalid-data-alert" severity="error" sx={display}>{alertText}</Alert>
                 <Grid container spacing={3}>
                   {/* Balance */}
                   <Grid item xs={12} md={8} lg={9}>
@@ -164,10 +175,9 @@ export const Wallet = () => {
                     <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
                       <Detail 
                         rows={data?.detail ?? []} 
-                        createHandler={createHandler} 
+                        createHandler={() => setModalOpen(true)}
                         editHandler={editHandler} 
                         deleteHandler={deleteHandler} 
-                        onClickAddButton={() => setModalOpen(true)}
                       />
                     </Paper>
                   </Grid>
@@ -181,7 +191,14 @@ export const Wallet = () => {
           open={modalOpen}
           onClose={() => setModalOpen(false)}
           actionText='Add data'
-          handleSubmit={() => {}}
+          date={dateString}
+          onSuccess={onSuccess}
+          />
+        
+        <ConfirmModal
+          open={confirmModalOpen}
+          onClose={() => setConfirmModalOpen(false)}
+          deleteHandler
           />
         </>
       );
