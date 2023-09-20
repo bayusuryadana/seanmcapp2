@@ -6,7 +6,7 @@ interface Props {
 }
 
 export const UserProvider: React.FC<Props> = ({ children }) => {
-    const [userContext, setPassword] = React.useState<string|null>()
+    const [userContext, setPassword] = React.useState<string|null>(null)
 
     const savePassword = (password: string|null) => {
         setPassword(password)

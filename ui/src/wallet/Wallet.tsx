@@ -26,44 +26,23 @@ export const Wallet = () => {
     const [display, setDisplay] = React.useState({ display: 'none' })
     const [alertText, setAlertText] = React.useState('')
     const [data, setData] = React.useState<WalletDashboardData|null>(null);
-    const [modalOpen, setModalOpen] = React.useState(false)
+    const [walletDetail, setWalletDetail] = React.useState<WalletDetail|null>(null)
 
     const toggleDrawer = () => setOpen(!open)
 
-    const onSuccess = (row: WalletDetail) => {
-      setModalOpen(false)
+    const onSuccess = (row: WalletDetail, actionText: String|undefined) => {
+      setWalletDetail(null)
       if (data !== null) {
-        const updatedDetail = {...data, detail: [...data.detail, row]}
-        setData(updatedDetail)
-      }
-    }
-
-    const editHandler = (_: WalletDetail) => {
-      setModalOpen(true)
-    }
-
-    const deleteHandler = (id: number) => {
-      // need modal/alert to confirm
-      // show banner
-      axios.post('api/wallet/delete', {id: id}, {
-        auth: {
-          username: 'bayu',
-          password: userContext ?? ""
-        }
-      }).then((response) => {
-        console.log(response)
-        if (response.data.data == '1') {
-          const index = data?.detail.findIndex((d) => d.id === id) ?? -1
+        if (actionText === 'Create') {
+          const updatedDetail = {...data, detail: [...data.detail, row]}
+          setData(updatedDetail)
+        } else if (actionText === 'Delete') {
+          const index = data?.detail.findIndex((d) => d.id === row.id) ?? -1
           if (index && index > -1 && data) {
-            setData({...data, detail: data.detail.splice(index, 1) ?? []} as WalletDashboardData)
+            data.detail.splice(index, 1)
           }
         }
-      })
-      .catch((error) => {
-        setDisplay({display: 'true'})
-        setAlertText('Failed to delete!')
-        console.log(error)
-      })
+      }
     }
 
     const date = new Date()
@@ -175,9 +154,9 @@ export const Wallet = () => {
                     <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
                       <Detail 
                         rows={data?.detail ?? []} 
-                        createHandler={() => setModalOpen(true)}
-                        editHandler={editHandler} 
-                        deleteHandler={deleteHandler} 
+                        createHandler={() => {setWalletDetail({ id: -1 } as WalletDetail)}}
+                        editHandler={(walletDetail: WalletDetail) => {setWalletDetail(walletDetail)}} 
+                        deleteHandler={(id: Number) => {setWalletDetail({ id: id} as WalletDetail)}} 
                       />
                     </Paper>
                   </Grid>
@@ -188,17 +167,10 @@ export const Wallet = () => {
         </ThemeProvider>
 
         <WalletModal 
-          open={modalOpen}
-          onClose={() => setModalOpen(false)}
-          actionText='Add data'
+          onClose={() => setWalletDetail(null)}
           date={dateString}
           onSuccess={onSuccess}
-          />
-        
-        <ConfirmModal
-          open={confirmModalOpen}
-          onClose={() => setConfirmModalOpen(false)}
-          deleteHandler
+          walletDetail={walletDetail}
           />
         </>
       );
