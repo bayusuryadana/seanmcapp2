@@ -1,8 +1,8 @@
-import * as React from 'react';
 import { useTheme } from '@mui/material/styles';
 import { LineChart, Line, XAxis, YAxis, Label, ResponsiveContainer } from 'recharts';
 import { Title } from './Title';
 import { WalletChartBalance } from './WalletModels';
+import { Fragment } from 'react';
 
 interface ChartProps {
   data: WalletChartBalance[]
@@ -13,7 +13,7 @@ export default function Chart(props: ChartProps) {
   const theme = useTheme();
 
   return (
-    <React.Fragment>
+    <Fragment>
       <Title>Balance</Title>
       <ResponsiveContainer>
         <LineChart
@@ -56,6 +56,6 @@ export default function Chart(props: ChartProps) {
           />
         </LineChart>
       </ResponsiveContainer>
-    </React.Fragment>
+    </Fragment>
   );
 }

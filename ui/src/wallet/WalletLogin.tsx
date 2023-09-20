@@ -9,19 +9,18 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import TextField from '@mui/material/TextField';
-import { useContext } from 'react';
+import { useContext, useState, FormEvent } from 'react';
 import { Navigate } from "react-router-dom";
 import axios from "axios";
 import { Alert } from "@mui/material";
-import React from "react";
 import { UserContext, UserContextType } from "./UserContext";
 
 export const WalletLogin = (_props: any) => {
   const  { userContext, savePassword } = useContext(UserContext) as UserContextType;
-  const [display, setDisplay] = React.useState({ display: 'none' })
-  const [text, setText] = React.useState("")
+  const [display, setDisplay] = useState({ display: 'none' })
+  const [text, setText] = useState("")
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const inputPassword = data.get('password')?.toString() ?? ""

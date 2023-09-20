@@ -1,10 +1,10 @@
-import * as React from 'react';
 import { Title } from './Title';
 import { WalletDetail } from './WalletModels';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Grid, IconButton, TableRow, TableHead, TableCell, TableBody, Table } from '@mui/material';
+import { Fragment } from 'react';
 
 interface DetailProps {
     rows: WalletDetail[]
@@ -16,7 +16,7 @@ interface DetailProps {
 export const Detail = (props: DetailProps) => {
 
   return (
-    <React.Fragment>
+    <Fragment>
       <Grid container justifyContent={'space-between'}>
         <Grid item>
           <Title>Detail</Title>
@@ -59,6 +59,6 @@ export const Detail = (props: DetailProps) => {
           ))}
         </TableBody>
       </Table>
-    </React.Fragment>
+    </Fragment>
   );
 }

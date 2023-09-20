@@ -1,6 +1,6 @@
 import { Button, Modal, Box, Typography, Alert, TextField, MenuItem, Select, Grid, InputLabel, FormControlLabel, Checkbox } from "@mui/material";
 import axios from "axios";
-import React, { useContext } from "react";
+import { useContext, useState, FormEvent, useEffect } from "react";
 import { UserContext, UserContextType } from "./UserContext";
 import { WalletDetail } from "./WalletModels";
 import { modalStyle } from "./constant";
@@ -14,14 +14,12 @@ interface WalletModalProps {
 
 export const WalletModal = (props: WalletModalProps) => {
     const { userContext } = useContext(UserContext) as UserContextType;
+    const [alert, setAlert] = useState({display: 'none', text: ''})
+    const [data, setData] = useState<WalletDetail|null>(null)
 
-    const [display, setDisplay] = React.useState('none')
-    const [displayText, setDisplayText] = React.useState('')
-    // const [formData, setData] = React.useState<WalletDetail|null>(null)
-
-    const [currency, setCurrency] = React.useState('')
-    const [category, setCategory] = React.useState('')
-    const [account, setAccount] = React.useState('')
+    useEffect( () => {
+        setData(props.walletDetail)
+    }, [props.walletDetail])
 
     const getAccount = (currency: string): string => {
         if (currency === 'SGD') 
@@ -36,7 +34,7 @@ export const WalletModal = (props: WalletModalProps) => {
         if (detail.id === -1) {
             return 'Create'
         } else if (detail.id > -1 &&
-            detail.date && detail.name && detail.category && detail.currency && detail.amount && detail.done && detail.account) {
+            detail.date && detail.name && detail.category && detail.currency && detail.amount && detail.done !== null && detail.account) {
                 return 'Edit'
         } else if (detail.id > -1) {
             return 'Delete'
@@ -44,13 +42,15 @@ export const WalletModal = (props: WalletModalProps) => {
     }
     const actionText = getActionText()
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault()
         
         const data = new FormData(event.currentTarget);
 
         if (actionText === 'Create') {
             submitCreate(data)
+        } else if (actionText === 'Edit') {
+            submitEdit(data)
         } else if (actionText === 'Delete') {
             submitDelete()
         }
@@ -77,15 +77,42 @@ export const WalletModal = (props: WalletModalProps) => {
                 password: userContext ?? ""
               }
         }).then((response) => {
-            setDisplay('none')
-            setDisplayText('')
+            setAlert({display: 'none', text: ''})
             const newData = {...payload, id: response.data.data.id}
             props.onSuccess(newData, actionText)
         })
         .catch((error) => {
             console.log(error)
-            setDisplay('true')
-            setDisplay('Gagal tot!')
+            setAlert({display: 'true', text: 'Gagal tot!'})
+        })
+    }
+
+    const submitEdit = (data: FormData) => {
+        const currency = data.get('currency')?.toString() ?? ""
+        const done = data.get('done')?.toString() ? true : false
+        const payload = {
+            'id': parseInt(props.walletDetail?.id.toString() ?? ""),
+            'date': parseInt(props.date),
+            'name': data.get('name')?.toString() ?? "",
+            'amount': parseInt(data.get('amount')?.toString() ?? ""),
+            'category': data.get('category')?.toString() ?? "",
+            'currency': currency,
+            'account': getAccount(currency),
+            'done': done
+        }
+
+        axios.post('api/wallet/update', payload, {
+            auth: {
+                username: 'bayu',
+                password: userContext ?? ""
+              }
+        }).then((_) => {
+            setAlert({display: 'none', text: ''})
+            props.onSuccess(payload, actionText)
+        })
+        .catch((error) => {
+            console.log(error)
+            setAlert({display: 'true', text: 'Gagal tot!'})
         })
     }
 
@@ -97,46 +124,43 @@ export const WalletModal = (props: WalletModalProps) => {
               password: userContext ?? ""
             }
           }).then((response) => {
-            console.log(response)
             if (response.data.data == '1') {
                 props.onSuccess({id: id} as WalletDetail, actionText)
             } else {
                 const errorMessage = 'something is wrong with the API'
                 console.log(errorMessage)
-                setDisplay('true')
-                setDisplayText(errorMessage)
+                setAlert({display: 'true', text: errorMessage})
             }
           })
           .catch((error) => {
             console.log(error)
-            setDisplay('true')
-            setDisplayText('Failed to delete!')
+            setAlert({display: 'true', text: 'Failed to delete!'})
           })
     }
 
     const renderForm = () => {
         return (
             <>
-                <Alert id="wrong-password-alert" severity="error" sx={{display: display, mb: 1}}>{displayText}</Alert>
+                <Alert id="wrong-password-alert" severity="error" sx={{display: alert.display, mb: 1}}>{alert.text}</Alert>
                 <Grid container spacing={1}>
                     <Grid item xs={12}>
                         <InputLabel>Name</InputLabel>
-                        <TextField required fullWidth name="name" type="text" variant="standard"/>
+                        <TextField required fullWidth name="name" type="text" value={data?.name ?? ''} variant="standard" onChange={(event) => {setData({...data, name: event.target.value} as WalletDetail)}} />
                     </Grid>
                     <Grid item xs={12}>
                         <InputLabel>Amount</InputLabel>
-                        <TextField required fullWidth name="amount" type="number" variant="standard"/>
+                        <TextField required fullWidth name="amount" type="number" value={data?.amount ?? ''} variant="standard"  onChange={(event) => {setData({...data, amount: parseInt(event.target.value)} as WalletDetail)}} />
                     </Grid>
                     <Grid item xs={12}>
                         <InputLabel>Category</InputLabel>
                         <Select
                             required
                             fullWidth
-                            value={category}
+                            value={data?.category ?? ""}
                             label="Category"
                             name="category"
                             variant="standard"
-                            onChange={(event) => setCategory(event.target.value)}
+                            onChange={(event) => setData({...data, category: event.target.value} as WalletDetail)}
                         >
                             <MenuItem value='Bonus'>Bonus</MenuItem>
                             <MenuItem value='Daily'>Daily</MenuItem>
@@ -159,14 +183,13 @@ export const WalletModal = (props: WalletModalProps) => {
                         <Select
                             required
                             fullWidth
-                            value={currency}
+                            value={data?.currency ?? ""}
                             label="currency"
                             name="currency"
                             variant="standard"
                             onChange={(event) => {
                                 const curr = event.target.value
-                                setCurrency(curr)
-                                setAccount(getAccount(curr).toString())
+                                setData({...data, currency: event.target.value, account: getAccount(curr).toString()} as WalletDetail)
                             }}
                         >
                             <MenuItem value={'SGD'}>SGD</MenuItem>
@@ -175,11 +198,20 @@ export const WalletModal = (props: WalletModalProps) => {
                     </Grid>
                     <Grid item xs={6}>
                         <InputLabel>Account</InputLabel>
-                        <TextField required disabled fullWidth value={account} name="account" type="text" variant="standard"/>
+                        <TextField required disabled fullWidth value={data?.account} name="account" type="text" variant="standard"/>
                     </Grid>
                     <Grid item xs={12}>
                         <FormControlLabel
-                            control={<Checkbox color="secondary" name="done" value="yes" />}
+                            control={
+                                <Checkbox 
+                                    color="secondary" 
+                                    name="done" 
+                                    value={data?.done ? 'yes' : ''} 
+                                    checked={data?.done??false} 
+                                    onChange={(event) => {
+                                        setData({...data, done: event.target.checked} as WalletDetail)
+                                    }} />
+                            }
                             label="Is it done?"
                         />
                     </Grid>
@@ -203,7 +235,7 @@ export const WalletModal = (props: WalletModalProps) => {
                   <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
                     {actionText === 'Delete' || renderForm()}
                     <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
-                        {actionText}
+                        {actionText === 'Delete' ? 'Delete' : 'Submit'}
                     </Button>
                   </Box>
               </Typography>

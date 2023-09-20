@@ -37,3 +37,8 @@ export type WalletDetail = {
     done: boolean;
     account: string;
 }
+
+export type WalletAlert = {
+    display: string
+    text: string
+}

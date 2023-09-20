@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import BarChartIcon from '@mui/icons-material/BarChart';
@@ -6,11 +5,11 @@ import { AppBar } from './AppBar';
 import { Drawer } from './Drawer';
 import Chart from './Chart';
 import { defaultTheme } from './constant';
-import { useContext } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { UserContext, UserContextType } from './UserContext';
 import axios from 'axios';
-import { WalletDashboardData, WalletDetail } from './WalletModels';
+import { WalletAlert, WalletDashboardData, WalletDetail } from './WalletModels';
 import { SeanmcappResponse } from '../CommonModels';
 import { Title } from './Title';
 import { Detail } from './Detail';
@@ -22,11 +21,10 @@ import { Box, CssBaseline, Toolbar, IconButton, Typography, Divider, List, ListI
 
 export const Wallet = () => {
     const { userContext, savePassword } = useContext(UserContext) as UserContextType;
-    const [open, setOpen] = React.useState(false);
-    const [display, setDisplay] = React.useState({ display: 'none' })
-    const [alertText, setAlertText] = React.useState('')
-    const [data, setData] = React.useState<WalletDashboardData|null>(null);
-    const [walletDetail, setWalletDetail] = React.useState<WalletDetail|null>(null)
+    const [open, setOpen] = useState(false);
+    const [alert, setAlert] = useState<WalletAlert>({display: 'none', text: ''})
+    const [data, setData] = useState<WalletDashboardData|null>(null);
+    const [walletDetail, setWalletDetail] = useState<WalletDetail|null>(null)
 
     const toggleDrawer = () => setOpen(!open)
 
@@ -36,10 +34,16 @@ export const Wallet = () => {
         if (actionText === 'Create') {
           const updatedDetail = {...data, detail: [...data.detail, row]}
           setData(updatedDetail)
+        } else if (actionText === 'Edit') {
+          const index = data?.detail.findIndex((d) => d.id === row.id) ?? -1
+          if (index && index > -1 && data) {
+            const updatedDetail = {...data, detail: [...data.detail.filter((_, i) => i !== index), row]}
+            setData(updatedDetail)
+          }
         } else if (actionText === 'Delete') {
           const index = data?.detail.findIndex((d) => d.id === row.id) ?? -1
           if (index && index > -1 && data) {
-            data.detail.splice(index, 1)
+            setData({...data, detail: data.detail.filter((_, i) => i !== index)})
           }
         }
       }
@@ -48,7 +52,7 @@ export const Wallet = () => {
     const date = new Date()
     const dateString = date.getFullYear().toString() + ('0' + (date.getMonth() + 1).toString()).slice(-2)
 
-    React.useEffect(() => {
+    useEffect(() => {
       axios.get('api/wallet/dashboard', {
         params: {
           date: dateString
@@ -59,14 +63,13 @@ export const Wallet = () => {
         }
       })
       .then((response) => {
-        setDisplay({ display: 'none'})
+        setAlert({display: 'none', text: ''})
         const apiData: SeanmcappResponse<WalletDashboardData> = response.data
         setData(apiData.data)
       })
       .catch((error) => {
         console.log(error)
-        setDisplay({ display: 'true'})
-        setAlertText("Data failed to fetch/parse!")
+        setAlert({display: 'true', text: 'Data failed to fetch/parse!'})
       })
     }, [])
 
@@ -123,7 +126,7 @@ export const Wallet = () => {
             >
               <Toolbar />
               <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-                <Alert id="invalid-data-alert" severity="error" sx={display}>{alertText}</Alert>
+                <Alert id="invalid-data-alert" severity="error" sx={{ display: alert.display}}>{alert.text}</Alert>
                 <Grid container spacing={3}>
                   {/* Balance */}
                   <Grid item xs={12} md={8} lg={9}>

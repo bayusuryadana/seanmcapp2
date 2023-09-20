@@ -1,12 +1,11 @@
-import React from "react";
-import { createContext } from "react";
+import { ReactNode, useState, FC, createContext } from "react";
 
 interface Props {
-    children: React.ReactNode
+    children: ReactNode
 }
 
-export const UserProvider: React.FC<Props> = ({ children }) => {
-    const [userContext, setPassword] = React.useState<string|null>(null)
+export const UserProvider: FC<Props> = ({ children }) => {
+    const [userContext, setPassword] = useState<string|null>(null)
 
     const savePassword = (password: string|null) => {
         setPassword(password)
