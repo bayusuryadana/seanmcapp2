@@ -45,7 +45,7 @@ class Database:
                             AND (
                                 (latitude IS NOT NULL AND longitude IS NOT NULL 
                                 AND latitude <= %(nw_lat)s AND latitude >= %(se_lat)s
-                                AND longitude <= %(nw_lng)s AND longitude >= %(se_lng)s)
+                                AND longitude <= %(se_lng)s AND longitude >= %(nw_lng)s)
                                 OR
                                 (%(nw_lat)s IS NULL OR %(se_lat)s IS NULL OR %(nw_lng)s IS NULL OR %(se_lng)s IS NULL)
                             )
