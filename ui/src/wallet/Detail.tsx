@@ -7,6 +7,7 @@ import { Grid, IconButton, TableRow, TableHead, TableCell, TableBody, Table } fr
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { Fragment } from 'react';
+import { CellTypography } from './CellTypography';
 
 interface DetailProps {
     date: string
@@ -105,11 +106,11 @@ export const Detail = (props: DetailProps) => {
           {props.rows.map((row) => (
             <TableRow key={row.id}>
               {/* row.date */}
-              <TableCell>{row.name}</TableCell>
-              <TableCell>{row.category}</TableCell>
-              <TableCell>{row.currency}</TableCell>
-              <TableCell>{row.account}</TableCell>
-              <TableCell align="right">{row.amount}</TableCell>
+              <TableCell><CellTypography done={row.done}>{row.name}</CellTypography></TableCell>
+              <TableCell><CellTypography done={row.done}>{row.category}</CellTypography></TableCell>
+              <TableCell><CellTypography done={row.done}>{row.currency}</CellTypography></TableCell>
+              <TableCell><CellTypography done={row.done}>{row.account}</CellTypography></TableCell>
+              <TableCell align="right"><CellTypography done={row.done}>{row.amount}</CellTypography></TableCell>
               <TableCell>
                 <IconButton aria-label="edit" color="primary" onClick={()=>props.editHandler(row)}>
                   <EditIcon />
