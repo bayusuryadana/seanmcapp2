@@ -14,7 +14,7 @@ export const MamenMap = ({
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
-    googleMapsApiKey: 'AIzaSyC3GbL9RhsifWaFD4We_PCDT2A2iDvprCE'
+    googleMapsApiKey: ''
   })
 
   const [map, setMap] = useState<google.maps.Map|null>(null)
