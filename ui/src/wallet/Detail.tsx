@@ -37,7 +37,6 @@ export const Detail = (props: DetailProps) => {
     const year = parseInt(date.slice(0,4))
     const month = parseInt(date.slice(4, 6)) - 1
     const newDate = dateConverter(year, month)
-    console.log(newDate)
     props.updateDashboard(newDate)
   }
 
@@ -45,7 +44,6 @@ export const Detail = (props: DetailProps) => {
     const year = parseInt(date.slice(0,4))
     const month = parseInt(date.slice(4, 6)) + 1
     const newDate = dateConverter(year, month)
-    console.log(newDate)
     props.updateDashboard(newDate)
   }
 
