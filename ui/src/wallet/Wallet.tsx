@@ -25,6 +25,7 @@ export const Wallet = () => {
     const [alert, setAlert] = useState<WalletAlert>({display: 'none', text: ''})
     const [data, setData] = useState<WalletDashboardData|null>(null);
     const [walletDetail, setWalletDetail] = useState<WalletDetail|null>(null)
+    const [date, setDate] = useState('')
 
     const toggleDrawer = () => setOpen(!open)
 
@@ -49,13 +50,10 @@ export const Wallet = () => {
       }
     }
 
-    const date = new Date()
-    const dateString = date.getFullYear().toString() + ('0' + (date.getMonth() + 1).toString()).slice(-2)
-
-    useEffect(() => {
+    const getWalletDashboard = (dateParam: string) => {
       axios.get('api/wallet/dashboard', {
         params: {
-          date: dateString
+          date: dateParam
         },
         auth: {
           username: 'bayu',
@@ -66,11 +64,19 @@ export const Wallet = () => {
         setAlert({display: 'none', text: ''})
         const apiData: SeanmcappResponse<WalletDashboardData> = response.data
         setData(apiData.data)
+        setDate(dateParam)
       })
       .catch((error) => {
         console.log(error)
         setAlert({display: 'true', text: 'Data failed to fetch/parse!'})
       })
+    }
+
+    useEffect(() => {
+      const newDate = new Date()
+      const dateString = newDate.getFullYear().toString() + ('0' + (newDate.getMonth() + 1).toString()).slice(-2)
+      setDate(dateString)
+      getWalletDashboard(dateString)
     }, [])
 
     if (userContext != null) {
@@ -156,7 +162,9 @@ export const Wallet = () => {
                   <Grid item xs={12}>
                     <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
                       <Detail 
+                        date={date}
                         rows={data?.detail ?? []} 
+                        updateDashboard={getWalletDashboard}
                         createHandler={() => {setWalletDetail({ id: -1 } as WalletDetail)}}
                         editHandler={(walletDetail: WalletDetail) => {setWalletDetail(walletDetail)}} 
                         deleteHandler={(id: Number) => {setWalletDetail({ id: id} as WalletDetail)}} 
@@ -171,7 +179,7 @@ export const Wallet = () => {
 
         <WalletModal 
           onClose={() => setWalletDetail(null)}
-          date={dateString}
+          date={date}
           onSuccess={onSuccess}
           walletDetail={walletDetail}
           />

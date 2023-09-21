@@ -7,7 +7,7 @@ interface TitleProps {
 
 export const Title = (props: TitleProps) => {
   return (
-    <Typography component="h2" variant="h6" color="primary" gutterBottom>
+    <Typography component="h2" variant="h6" color="primary" gutterBottom sx={{display: 'inline'}}>
       {props.children}
     </Typography>
   );
