@@ -3,10 +3,10 @@ import { WalletDetail } from './WalletModels';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Grid, IconButton, TableRow, TableHead, TableCell, TableBody, Table } from '@mui/material';
+import { Grid, IconButton, TableRow, TableHead, TableCell, TableBody, Table, Button, Popover, Box, Alert, TextField } from '@mui/material';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import { Fragment } from 'react';
+import { FormEvent, Fragment, useState } from 'react';
 import { CellTypography } from './CellTypography';
 
 interface DetailProps {
@@ -19,6 +19,9 @@ interface DetailProps {
 }
 
 export const Detail = (props: DetailProps) => {
+
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const [alert, setAlert] = useState({display: 'none', text: ''})
 
   const dateConverter = (year: number, month: number) => {
     if (month == 0) {
@@ -70,6 +73,29 @@ export const Detail = (props: DetailProps) => {
     return monthName+' '+date.slice(0, 4)
   }
 
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popover' : undefined;
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const input = data.get('dateInput')?.toString() ?? ""
+    if (input.length > 6 || input.length < 6) {
+      setAlert({display: 'true', text: 'Salah format goblok!'})
+    } else {
+      props.updateDashboard(input)
+      setAlert({display: 'none', text: ''})
+    }
+  }
+
   return (
     <Fragment>
       <Grid container justifyContent={'space-between'}>
@@ -80,7 +106,28 @@ export const Detail = (props: DetailProps) => {
             <IconButton color='primary' size='medium' sx={{display: 'inline'}} onClick={() => prevMonth(props.date)}>
                 <ArrowLeftIcon />
             </IconButton>
-            <Title>{convertTitle(props.date)}</Title>
+            <Button aria-describedby={id} variant="contained" onClick={handleClick}>
+            {convertTitle(props.date)}
+            </Button>
+            <Popover
+              id={id}
+              open={open}
+              anchorEl={anchorEl}
+              onClose={handleClose}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+              }}
+            >
+              {/* <Typography sx={{ p: 2 }}>The content of the Popover.</Typography> */}
+              <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, p: 2 }}>
+                <Alert id="wrong-format-alert" severity="error" sx={{ display: alert.display}}>{alert.text}</Alert>
+                <TextField margin="normal" required fullWidth name="dateInput" label="Which month you want?" type="number" id="dateInput"/>
+                <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+                    GO!
+                </Button>
+              </Box> 
+            </Popover>
             <IconButton color='primary' size='medium' sx={{display: 'inline'}} onClick={() => nextMonth(props.date)}>
                 <ArrowRightIcon />
             </IconButton>

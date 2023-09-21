@@ -10,8 +10,7 @@ import { UserContext, UserContextType } from "./UserContext";
 
 export const WalletLogin = (_props: any) => {
   const  { userContext, savePassword } = useContext(UserContext) as UserContextType;
-  const [display, setDisplay] = useState({ display: 'none' })
-  const [text, setText] = useState("")
+  const [alert, setAlert] = useState({display: 'none', text:''})
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -25,18 +24,17 @@ export const WalletLogin = (_props: any) => {
       }
     })
     .then(() => {
-      setDisplay({ display: 'none' })
+      setAlert({ display: 'none', text: '' })
       savePassword(inputPassword)
     })
     .catch((error) => {
       console.log(error);
-      setDisplay({ display: 'true'})
       if (error.response && error.response.status == 404) {
-        setText("Anjing gak nyambung!")
+        setAlert({ display: 'true', text: 'Anjing gak nyambung!'})
       } else if (error.response.status == 403) {
-        setText("Salah password goblok!")
+        setAlert({ display: 'true', text: 'Salah password goblok!'})
       } else {
-        setText("Gatau nih gabisanya kenapa tot!")
+        setAlert({ display: 'true', text: 'Gatau nih gabisanya kenapa tot!'})
       }
     });
   };
@@ -76,7 +74,7 @@ export const WalletLogin = (_props: any) => {
                   Sign in
                 </Typography>
                 <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-                  <Alert id="wrong-password-alert" severity="error" sx={display}>{text}</Alert>
+                  <Alert id="wrong-password-alert" severity="error" sx={{ display: alert.display}}>{alert.text}</Alert>
                   <TextField margin="normal" required fullWidth name="password" label="Password" type="password" id="password" autoComplete="current-password" />
                   <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
                       Sign In
