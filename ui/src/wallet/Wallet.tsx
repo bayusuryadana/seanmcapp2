@@ -9,7 +9,7 @@ import { useContext, useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { UserContext, UserContextType } from './UserContext';
 import axios from 'axios';
-import { WalletAlert, WalletDashboardData, WalletDetail } from './WalletModels';
+import { WalletAlert, WalletDashboardData, WalletDetail, WalletPlanned } from './WalletModels';
 import { SeanmcappResponse } from '../CommonModels';
 import { Title } from './Title';
 import { Detail } from './Detail';
@@ -164,6 +164,7 @@ export const Wallet = () => {
                       <Detail 
                         date={date}
                         rows={data?.detail ?? []} 
+                        planned={data?.planned ?? { sgd: 0, idr: 0} as WalletPlanned}
                         updateDashboard={getWalletDashboard}
                         createHandler={() => {setWalletDetail({ id: -1 } as WalletDetail)}}
                         editHandler={(walletDetail: WalletDetail) => {setWalletDetail(walletDetail)}} 

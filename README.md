@@ -15,7 +15,6 @@ done:
 		wallet(web)
 
 high-prio:
-	wallet (implement planned)
 	portofolio(web)
 	mamen(web)
 	instagram + twitter (logged in) -> cache cleaner

@@ -1,9 +1,9 @@
 import { Title } from './Title';
-import { WalletDetail } from './WalletModels';
+import { WalletDetail, WalletPlanned } from './WalletModels';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Grid, IconButton, TableRow, TableHead, TableCell, TableBody, Table, Button, Popover, Box, Alert, TextField } from '@mui/material';
+import { Grid, IconButton, TableRow, TableHead, TableCell, TableBody, Table, Button, Popover, Box, Alert, TextField, Typography } from '@mui/material';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { FormEvent, Fragment, useState } from 'react';
@@ -12,6 +12,7 @@ import { CellTypography } from './CellTypography';
 interface DetailProps {
     date: string
     rows: WalletDetail[]
+    planned: WalletPlanned
     editHandler: (row: WalletDetail) => void
     deleteHandler: (id: number) => void
     createHandler: () => void
@@ -170,6 +171,9 @@ export const Detail = (props: DetailProps) => {
           ))}
         </TableBody>
       </Table>
+      <Typography sx={{ p: 2 }}>
+        Cash balance end of month | SGD: <b>S$ {props.planned.sgd.toLocaleString()}</b> | IDR: <b>Rp. {props.planned.idr.toLocaleString()}</b>
+      </Typography>
     </Fragment>
   );
 }
