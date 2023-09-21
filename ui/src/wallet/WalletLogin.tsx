@@ -1,18 +1,11 @@
 import { defaultTheme } from "./constant"
-import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
 import { AppBar } from './AppBar';
-import Typography from '@mui/material/Typography';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import TextField from '@mui/material/TextField';
 import { useContext, useState, FormEvent } from 'react';
 import { Navigate } from "react-router-dom";
 import axios from "axios";
-import { Alert } from "@mui/material";
+import { Alert, Paper, Avatar, Button, ThemeProvider, Box, Toolbar, Typography, TextField } from "@mui/material";
 import { UserContext, UserContextType } from "./UserContext";
 
 export const WalletLogin = (_props: any) => {
@@ -75,19 +68,21 @@ export const WalletLogin = (_props: any) => {
               marginTop: 8,
               paddingTop: 8,
             }}>
-            <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-              <LockOutlinedIcon />
-            </Avatar>
-            <Typography component="h1" variant="h5">
-              Sign in
-            </Typography>
-            <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-              <Alert id="wrong-password-alert" severity="error" sx={display}>{text}</Alert>
-              <TextField margin="normal" required fullWidth name="password" label="Password" type="password" id="password" autoComplete="current-password" />
-              <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
-                  Sign In
-              </Button>
-            </Box>
+              <Paper sx={{p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+                  <LockOutlinedIcon />
+                </Avatar>
+                <Typography component="h1" variant="h5">
+                  Sign in
+                </Typography>
+                <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+                  <Alert id="wrong-password-alert" severity="error" sx={display}>{text}</Alert>
+                  <TextField margin="normal" required fullWidth name="password" label="Password" type="password" id="password" autoComplete="current-password" />
+                  <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+                      Sign In
+                  </Button>
+                </Box> 
+            </Paper>
           </Box>
         </Box>
       </ThemeProvider>

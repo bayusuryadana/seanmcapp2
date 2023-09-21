@@ -143,19 +143,19 @@ export const Wallet = () => {
                   {/* Saving accounts */}
                   <Grid item xs={12} md={4} lg={3}>
                     <Paper sx={{p: 2, display: 'flex', flexDirection: 'column', height: 240, }}>
-                    <Title>Current Savings</Title>
-                    <Typography color="text.secondary">
-                      on DBS account
-                    </Typography>
-                    <Typography component="p" variant="h5" sx={{ flex: 0.5 }}>
-                      S$ {data?.savings.dbs.toLocaleString()}
-                    </Typography>
-                    <Typography color="text.secondary">
-                      on BCA account
-                    </Typography>
-                    <Typography component="p" variant="h5">
-                      Rp. {data?.savings.bca.toLocaleString()}
-                    </Typography>
+                      <Title>Current Savings</Title>
+                      <Typography color="text.secondary">
+                        on DBS account
+                      </Typography>
+                      <Typography component="p" variant="h5" sx={{ flex: 0.5 }}>
+                        S$ {data?.savings.dbs.toLocaleString()}
+                      </Typography>
+                      <Typography color="text.secondary">
+                        on BCA account
+                      </Typography>
+                      <Typography component="p" variant="h5">
+                        Rp. {data?.savings.bca.toLocaleString()}
+                      </Typography>
                     </Paper>
                   </Grid>
                   {/* Data */}
