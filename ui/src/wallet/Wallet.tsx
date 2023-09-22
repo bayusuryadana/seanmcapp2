@@ -1,8 +1,4 @@
 import { ThemeProvider } from '@mui/material/styles';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import { AppBar } from './AppBar';
-import { Drawer } from './Drawer';
 import Chart from './Chart';
 import { defaultTheme } from './constant';
 import { useContext, useState, useEffect } from 'react';
@@ -14,10 +10,9 @@ import { SeanmcappResponse } from '../CommonModels';
 import { Title } from './Title';
 import { Detail } from './Detail';
 import { WalletModal } from './Modal';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import LogoutIcon from '@mui/icons-material/Logout';
-import MenuIcon from '@mui/icons-material/Menu';
-import { Box, CssBaseline, Toolbar, IconButton, Typography, Divider, List, ListItemButton, ListItemIcon, ListItemText, Container, Alert, Grid, Paper } from '@mui/material';
+import { Box, CssBaseline, Toolbar, Typography, Container, Alert, Grid, Paper } from '@mui/material';
+import { WalletAppBar } from './AppBar';
+import { WalletDrawer } from './Drawer';
 
 export const Wallet = () => {
     const { userContext, savePassword } = useContext(UserContext) as UserContextType;
@@ -28,6 +23,7 @@ export const Wallet = () => {
     const [date, setDate] = useState('')
 
     const toggleDrawer = () => setOpen(!open)
+    const logoutHandler = () => savePassword(null)
 
     const onSuccess = (row: WalletDetail, actionText: String|undefined) => {
       setWalletDetail(null)
@@ -85,41 +81,8 @@ export const Wallet = () => {
         <ThemeProvider theme={defaultTheme}>
           <Box sx={{ display: 'flex' }}>
             <CssBaseline />
-            <AppBar position="absolute" open={open}>
-              <Toolbar sx={{ pr: '24px', }}>
-                <IconButton edge="start" color="inherit" aria-label="open drawer" onClick={toggleDrawer} sx={{ marginRight: '36px', ...(open && { display: 'none' }),}}>
-                  <MenuIcon />
-                </IconButton>
-                <Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
-                  Seanmcwallet
-                </Typography>
-                <IconButton color="inherit" onClick={() => savePassword(null)}>
-                  <LogoutIcon />
-                </IconButton>
-              </Toolbar>
-            </AppBar>
-            <Drawer variant="permanent" open={open}>
-              <Toolbar sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', px: [1],}}>
-                <IconButton onClick={toggleDrawer}>
-                  <ChevronLeftIcon />
-                </IconButton>
-              </Toolbar>
-              <Divider />
-              <List component="nav">
-                <ListItemButton>
-                    <ListItemIcon>
-                        <DashboardIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Dashboard" />
-                </ListItemButton>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <BarChartIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Reports" />
-                </ListItemButton>
-              </List>
-            </Drawer>
+            <WalletAppBar open={open} toggleDrawer={toggleDrawer} logoutHandler={logoutHandler} />
+            <WalletDrawer open={open} toggleDrawer={toggleDrawer} />
             <Box component="main" sx={{
                 backgroundColor: (theme) =>
                   theme.palette.mode === 'light'

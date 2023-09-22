@@ -13,10 +13,11 @@ done:
 	web:
 		home(web)
 		wallet(web)
+		mamen(web)
 
 high-prio:
 	portofolio(web)
-	mamen(web)
+	portofolio(scheduler)
 	instagram + twitter (logged in) -> cache cleaner
 	*new* blog(api + web)
 
