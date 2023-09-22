@@ -153,7 +153,6 @@ export const Detail = (props: DetailProps) => {
         <TableBody>
           {props.rows.map((row) => (
             <TableRow key={row.id}>
-              {/* row.date */}
               <TableCell><CellTypography done={row.done}>{row.name}</CellTypography></TableCell>
               <TableCell><CellTypography done={row.done}>{row.category}</CellTypography></TableCell>
               <TableCell><CellTypography done={row.done}>{row.currency}</CellTypography></TableCell>

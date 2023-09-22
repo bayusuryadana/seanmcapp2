@@ -162,6 +162,13 @@ class Database:
             raise e
         return is_success
     
+    def wallet_porto_dashboard(self):
+        self.cursor.execute("SELECT * FROM stocks")
+        stocks = self.cursor.fetchall()
+        return {
+            "stocks": stocks
+        }
+    
     def instagram(self):
         self.cursor.execute("SELECT * FROM accounts WHERE group_type = 2")
         accounts = self.cursor.fetchall()
@@ -217,7 +224,6 @@ class Database:
             })
         
         return result
-
 
     ########## reserved function area ##########
 
