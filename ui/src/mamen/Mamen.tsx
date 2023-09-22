@@ -3,7 +3,7 @@ import { defaultTheme } from "./constant"
 import { MamenMap } from "./MamenMap";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { SeanmcappResponse } from "../CommonModels";
+import { SeanmcappResponse } from "../common";
 
 export const Mamen = () => {
 

@@ -1,11 +1,11 @@
-import { ThemeProvider } from '@mui/material/styles';
 import MuiDrawer from '@mui/material/Drawer';
 import { styled } from '@mui/material/styles';
-import { defaultTheme, drawerWidth } from './constant';
+import { drawerWidth } from './constant';
 import { Toolbar, IconButton, Divider, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import { useNavigate } from 'react-router-dom';
 
 export const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
   ({ theme, open }) => ({
@@ -39,30 +39,31 @@ interface WalletDrawerProps {
 }
 
 export const WalletDrawer = (props: WalletDrawerProps) => {
+
+  const navigate = useNavigate()
+
   return (
-    <ThemeProvider theme={defaultTheme}>
-      <Drawer variant="permanent" open={props.open}>
-        <Toolbar sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', px: [1],}}>
-          <IconButton onClick={props.toggleDrawer}>
-            <ChevronLeftIcon />
-          </IconButton>
-        </Toolbar>
-        <Divider />
-        <List component="nav">
-          <ListItemButton>
-              <ListItemIcon>
-                  <DashboardIcon />
-              </ListItemIcon>
-              <ListItemText primary="Dashboard" />
-          </ListItemButton>
-          <ListItemButton>
-              <ListItemIcon>
-                  <BarChartIcon />
-              </ListItemIcon>
-              <ListItemText primary="Reports" />
-          </ListItemButton>
-        </List>
-      </Drawer>
-    </ThemeProvider>
+    <Drawer variant="permanent" open={props.open}>
+      <Toolbar sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', px: [1],}}>
+        <IconButton onClick={props.toggleDrawer}>
+          <ChevronLeftIcon />
+        </IconButton>
+      </Toolbar>
+      <Divider />
+      <List component="nav">
+        <ListItemButton onClick={() => navigate('/wallet')}>
+            <ListItemIcon>
+                <DashboardIcon />
+            </ListItemIcon>
+            <ListItemText primary="Dashboard" />
+        </ListItemButton>
+        <ListItemButton onClick={() => navigate('/wallet/porto')}>
+            <ListItemIcon>
+                <BarChartIcon />
+            </ListItemIcon>
+            <ListItemText primary="Portofolio" />
+        </ListItemButton>
+      </List>
+    </Drawer>
   )
 }

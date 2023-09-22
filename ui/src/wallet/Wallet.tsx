@@ -1,83 +1,21 @@
 import { ThemeProvider } from '@mui/material/styles';
-import Chart from './Chart';
 import { defaultTheme } from './constant';
-import { useContext, useState, useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useContext, useState } from 'react';
+import { Navigate, Outlet } from 'react-router-dom';
 import { UserContext, UserContextType } from './UserContext';
-import axios from 'axios';
-import { WalletAlert, WalletDashboardData, WalletDetail, WalletPlanned } from './WalletModels';
-import { SeanmcappResponse } from '../CommonModels';
-import { Title } from './Title';
-import { Detail } from './Detail';
-import { WalletModal } from './Modal';
-import { Box, CssBaseline, Toolbar, Typography, Container, Alert, Grid, Paper } from '@mui/material';
+import { Box, CssBaseline, Toolbar } from '@mui/material';
 import { WalletAppBar } from './AppBar';
 import { WalletDrawer } from './Drawer';
 
 export const Wallet = () => {
     const { userContext, savePassword } = useContext(UserContext) as UserContextType;
     const [open, setOpen] = useState(false);
-    const [alert, setAlert] = useState<WalletAlert>({display: 'none', text: ''})
-    const [data, setData] = useState<WalletDashboardData|null>(null);
-    const [walletDetail, setWalletDetail] = useState<WalletDetail|null>(null)
-    const [date, setDate] = useState('')
 
     const toggleDrawer = () => setOpen(!open)
     const logoutHandler = () => savePassword(null)
 
-    const onSuccess = (row: WalletDetail, actionText: String|undefined) => {
-      setWalletDetail(null)
-      if (data !== null) {
-        if (actionText === 'Create') {
-          const updatedDetail = {...data, detail: [...data.detail, row]}
-          setData(updatedDetail)
-        } else if (actionText === 'Edit') {
-          const index = data?.detail.findIndex((d) => d.id === row.id) ?? -1
-          if (index && index > -1 && data) {
-            const updatedDetail = {...data, detail: [...data.detail.filter((_, i) => i !== index), row]}
-            setData(updatedDetail)
-          }
-        } else if (actionText === 'Delete') {
-          const index = data?.detail.findIndex((d) => d.id === row.id) ?? -1
-          if (index && index > -1 && data) {
-            setData({...data, detail: data.detail.filter((_, i) => i !== index)})
-          }
-        }
-      }
-    }
-
-    const getWalletDashboard = (dateParam: string) => {
-      axios.get('api/wallet/dashboard', {
-        params: {
-          date: dateParam
-        },
-        auth: {
-          username: 'bayu',
-          password: userContext ?? ""
-        }
-      })
-      .then((response) => {
-        setAlert({display: 'none', text: ''})
-        const apiData: SeanmcappResponse<WalletDashboardData> = response.data
-        setData(apiData.data)
-        setDate(dateParam)
-      })
-      .catch((error) => {
-        console.log(error)
-        setAlert({display: 'true', text: 'Data failed to fetch/parse!'})
-      })
-    }
-
-    useEffect(() => {
-      const newDate = new Date()
-      const dateString = newDate.getFullYear().toString() + ('0' + (newDate.getMonth() + 1).toString()).slice(-2)
-      setDate(dateString)
-      getWalletDashboard(dateString)
-    }, [])
-
     if (userContext != null) {
       return (
-        <>
         <ThemeProvider theme={defaultTheme}>
           <Box sx={{ display: 'flex' }}>
             <CssBaseline />
@@ -93,61 +31,11 @@ export const Wallet = () => {
                 overflow: 'auto',
               }}
             >
-              <Toolbar />
-              <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-                <Alert id="invalid-data-alert" severity="error" sx={{ display: alert.display}}>{alert.text}</Alert>
-                <Grid container spacing={3}>
-                  {/* Balance */}
-                  <Grid item xs={12} md={8} lg={9}>
-                    <Paper sx={{p: 2, display: 'flex', flexDirection: 'column', height: 240, }}>
-                        <Chart data={data?.chart.balance ?? []} />
-                    </Paper>
-                  </Grid>
-                  {/* Saving accounts */}
-                  <Grid item xs={12} md={4} lg={3}>
-                    <Paper sx={{p: 2, display: 'flex', flexDirection: 'column', height: 240, }}>
-                      <Title>Current Savings</Title>
-                      <Typography color="text.secondary">
-                        on DBS account
-                      </Typography>
-                      <Typography component="p" variant="h5" sx={{ flex: 0.5 }}>
-                        S$ {data?.savings.dbs.toLocaleString()}
-                      </Typography>
-                      <Typography color="text.secondary">
-                        on BCA account
-                      </Typography>
-                      <Typography component="p" variant="h5">
-                        Rp. {data?.savings.bca.toLocaleString()}
-                      </Typography>
-                    </Paper>
-                  </Grid>
-                  {/* Data */}
-                  <Grid item xs={12}>
-                    <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                      <Detail 
-                        date={date}
-                        rows={data?.detail ?? []} 
-                        planned={data?.planned ?? { sgd: 0, idr: 0} as WalletPlanned}
-                        updateDashboard={getWalletDashboard}
-                        createHandler={() => {setWalletDetail({ id: -1 } as WalletDetail)}}
-                        editHandler={(walletDetail: WalletDetail) => {setWalletDetail(walletDetail)}} 
-                        deleteHandler={(id: Number) => {setWalletDetail({ id: id} as WalletDetail)}} 
-                      />
-                    </Paper>
-                  </Grid>
-                </Grid>
-              </Container>
+              <Toolbar />{/* this Toolbar is supposed for bufffer below the real AppBar */}
+              <Outlet />
             </Box>
           </Box>
         </ThemeProvider>
-
-        <WalletModal 
-          onClose={() => setWalletDetail(null)}
-          date={date}
-          onSuccess={onSuccess}
-          walletDetail={walletDetail}
-          />
-        </>
       );
     } else {
       return <Navigate to="/wallet/login" />

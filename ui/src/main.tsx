@@ -7,6 +7,8 @@ import { Wallet } from './wallet/Wallet.tsx'
 import { WalletLogin } from './wallet/WalletLogin.tsx'
 import { UserProvider } from './wallet/UserContext.tsx'
 import { StrictMode } from 'react'
+import { WalletDashboard } from './wallet/WalletDashboard.tsx'
+import { WalletPorto } from './wallet/WalletPorto.tsx'
 
 const router = createBrowserRouter([
   {
@@ -22,8 +24,17 @@ const router = createBrowserRouter([
     element: <WalletLogin />
   },
   {
-    path: "/wallet",
-    element: <Wallet />
+    element: <Wallet />,
+    children: [
+      {
+        path: "/wallet",
+        element: <WalletDashboard />
+      },
+      {
+        path: "/wallet/porto",
+        element: <WalletPorto />
+      }
+    ]
   },
 ]);
 

@@ -1,7 +1,7 @@
 import { GoogleMap, Marker, useJsApiLoader, InfoWindow } from "@react-google-maps/api";
 import axios from "axios";
 import { useCallback, useState } from "react";
-import { SeanmcappResponse } from "../CommonModels";
+import { SeanmcappResponse } from "../common";
 import { Divider, Fab, Grid, IconButton, Typography } from "@mui/material";
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import PlaceIcon from '@mui/icons-material/Place';

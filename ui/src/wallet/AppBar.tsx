@@ -1,6 +1,6 @@
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
-import { ThemeProvider, styled } from '@mui/material/styles';
-import { defaultTheme, drawerWidth } from './constant';
+import { styled } from '@mui/material/styles';
+import { drawerWidth } from './constant';
 import { Toolbar, IconButton, Typography } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -35,25 +35,23 @@ interface WalletAppBarProps {
 
 export const WalletAppBar = (props: WalletAppBarProps) => {
   return (
-    <ThemeProvider theme={defaultTheme}>
-      <AppBar position="absolute" open={props.open}>
-        <Toolbar sx={{ pr: '24px', }}>
-          <IconButton 
-            edge="start" 
-            color="inherit" 
-            aria-label="open drawer" 
-            onClick={props.toggleDrawer} 
-            sx={{ marginRight: '36px', ...({open} && { display: 'true' }),}}>
-            <MenuIcon />
-          </IconButton>
-          <Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
-            Seanmcwallet
-          </Typography>
-          <IconButton color="inherit" onClick={props.logoutHandler}>
-            <LogoutIcon />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-    </ThemeProvider>
+    <AppBar position="absolute" open={props.open}>
+      <Toolbar sx={{ pr: '24px', }}>
+        <IconButton 
+          edge="start" 
+          color="inherit" 
+          aria-label="open drawer" 
+          onClick={props.toggleDrawer} 
+          sx={{ marginRight: '36px', ...({open} && { display: 'true' }),}}>
+          <MenuIcon />
+        </IconButton>
+        <Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
+          Seanmcwallet
+        </Typography>
+        <IconButton color="inherit" onClick={props.logoutHandler}>
+          <LogoutIcon />
+        </IconButton>
+      </Toolbar>
+    </AppBar>
   )
 }
