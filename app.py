@@ -61,12 +61,18 @@ def api(path):
             if request.method == 'POST':
                 result = db.mamen_search(MamenRequest(request.get_json()))
                 return success_handler(result)
+        case 'city-list':
+            if request.method == 'GET':
+                result = db.mamen_cities()
+                return success_handler(result)
         # case 'instagram':
         #     if request.method == 'GET':
         #         result = db.instagram()
         #         return success_handler(result)
-            # else:
-                # return db.mamen_fetch_lat_lng()
+        # case 'stalls':
+        #         return db.mamen_fetch_lat_lng()
+        # case 'cities':
+        #         return db.cities_fetch_lat_lng()
         # case 'news':
         #     scheduled_news()
         #     return 'done'

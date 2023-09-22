@@ -2,7 +2,10 @@ import { GoogleMap, Marker, useJsApiLoader, InfoWindow } from "@react-google-map
 import axios from "axios";
 import { useCallback, useState } from "react";
 import { SeanmcappResponse } from "../CommonModels";
-import { Box, Typography } from "@mui/material";
+import { Divider, Fab, Grid, IconButton, Typography } from "@mui/material";
+import YouTubeIcon from '@mui/icons-material/YouTube';
+import PlaceIcon from '@mui/icons-material/Place';
+import MyLocationIcon from '@mui/icons-material/MyLocation';
 
 export const MamenMap = ({
   center,
@@ -14,7 +17,7 @@ export const MamenMap = ({
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
-    googleMapsApiKey: ''
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_API_KEY
   })
 
   const [map, setMap] = useState<google.maps.Map|null>(null)
@@ -60,13 +63,31 @@ export const MamenMap = ({
     getStalls(nw, se)
   }
 
+  const onMyLocationHandler = () => {
+    navigator.geolocation.getCurrentPosition((pos) => {
+      const lat = pos.coords.latitude
+      const lng = pos.coords.longitude
+      map?.setCenter({lat, lng})
+    }, (err) => {console.log(err)})
+  }
+
   const renderInfoWindow = () => {
     return (
       <InfoWindow onCloseClick={() => {setInfoWindow(null)}}>
-        <Box m={2}>
-          <Typography>{infoWindow?.youtube_url}</Typography>
-          <Typography>{infoWindow?.gmaps_url}</Typography>
-        </Box>
+        <Grid container justifyContent={'space-between'} p={1}>
+          <Grid item sx={{display: 'flex', alignItems: 'center'}}>
+            <Typography>{infoWindow?.name}</Typography>
+          </Grid>
+          <Divider orientation="vertical" variant="middle" flexItem sx={{ml: 2, mr: 2}}/>
+          <Grid item>
+            <IconButton aria-label="youtube" size="small" onClick={() => window.open(infoWindow?.youtube_url)}>
+              <YouTubeIcon sx={{color: 'red'}}/>
+            </IconButton>
+            <IconButton aria-label="gmaps" size="small" onClick={() => window.open(infoWindow?.gmaps_url)}>
+              <PlaceIcon sx={{color: '#1976d2'}}/>
+            </IconButton>
+          </Grid>
+        </Grid>
       </InfoWindow>
     )
   }
@@ -79,7 +100,11 @@ export const MamenMap = ({
       onLoad={onLoad}
       onUnmount={onUnmount}
       onIdle={onChangeHandler}
+      onClick={() => setInfoWindow(null)}
     >
+      <Fab color="primary" aria-label="my-location" sx={{position: 'absolute', bottom: 32, left: 32}} onClick={onMyLocationHandler}>
+        <MyLocationIcon />
+      </Fab>
       {stalls.map((stall) => (
         <Marker key={stall.id} position={{lat: stall.latitude, lng: stall.longitude}} onClick={() => {setInfoWindow(stall)}}>
           {infoWindow?.id === stall.id && renderInfoWindow()}
@@ -93,6 +118,7 @@ export const MamenMap = ({
 
 export type Stall = {
   id: number
+  name: string
   gmaps_url: string
   youtube_url: string
   latitude: number

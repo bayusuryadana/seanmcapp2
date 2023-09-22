@@ -60,6 +60,11 @@ class Database:
         stalls = self.cursor.fetchall()
         return stalls
     
+    def mamen_cities(self):
+        self.cursor.execute("SELECT * FROM cities")
+        cities = self.cursor.fetchall()
+        return cities
+    
     def _wallet_get_saving_account(self, date=None):
         done = True if date is None else None
         query = """SELECT SUM(amount) FROM wallets 
@@ -231,6 +236,23 @@ class Database:
             self.cursor.execute("UPDATE stalls SET latitude = %s, longitude = %s WHERE id = %s", (lat, lng, stall['id']))
             updated_rows += self.cursor.rowcount
             self.conn.commit()
+        return str(updated_rows)
+    
+    def cities_fetch_lat_lng(self):
+        self.cursor.execute("SELECT * FROM cities")
+        cities = self.cursor.fetchall()
+        filtered_cities = [c for c in cities if c['latitude'] is None or c['longitude'] is None]
+        google_api_key = os.environ['GOOGLE_API_KEY']
+        updated_rows = 0
+        for city in filtered_cities:
+            url = 'https://maps.googleapis.com/maps/api/geocode/json?key=' + google_api_key + '&address=' + city['name']
+            response = json.loads(_request(url))
+            if (len(response['results']) > 0):
+                lat = response['results'][0]['geometry']['location']['lat']
+                lng = response['results'][0]['geometry']['location']['lng']
+                self.cursor.execute("UPDATE cities SET latitude = %s, longitude = %s WHERE id = %s", (lat, lng, city['id']))
+                updated_rows += self.cursor.rowcount
+                self.conn.commit()
         return str(updated_rows)
 
 ########## util in this package ##########

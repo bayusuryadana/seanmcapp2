@@ -98,3 +98,10 @@ CREATE TABLE stalls (
     latitude float,
     longitude float
 );
+
+CREATE TABLE cities (
+    id integer primary key,
+    name character varying (20) not null,
+    latitude float,
+    longitude float
+);
