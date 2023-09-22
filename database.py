@@ -290,4 +290,4 @@ def scheduled_news():
             message += news.flag + ' ' + news.name + ' - [' + title + '](' + url + ')\n\n'
         except Exception as e:
             print(news.name + ': ' + str(e))
-    _telegram_send_message(telegram_private_chat_id, message)
+    _telegram_send_message(telegram_group_chat_id, message)

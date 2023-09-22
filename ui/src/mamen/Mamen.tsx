@@ -7,6 +7,7 @@ import { SeanmcappResponse } from "../CommonModels";
 
 export const Mamen = () => {
 
+  const [isloading, setIsloading] = useState(true);
   const [cities, setCities] = useState<{label: string, id: number, lat: number, lng: number}[]>([])
   const [center, setCenter] = useState<{lat: number, lng: number}>({lat: -6.173724660823213, lng: 106.8260522541504})
 
@@ -17,6 +18,7 @@ export const Mamen = () => {
       setCities(response.data.map((city) => {return {label: city.name, id: city.id, lat: city.latitude, lng: city.longitude}}))
     })
     .catch((err) => {console.log(err)})
+    .finally(() => setIsloading(false))
   }, [])
 
   return (
@@ -35,7 +37,7 @@ export const Mamen = () => {
         <Grid container>
           <Grid item xs></Grid>
           <Grid item xs={12}>
-            <Box p={3}>
+            <Box pl={3} pt={3}>
               <Autocomplete
                 disablePortal
                 id="combo-box-demo"
@@ -46,7 +48,7 @@ export const Mamen = () => {
               />
             </Box>
             <Box p={3}>
-              <MamenMap center={center} zoom={13}/>
+              {isloading || <MamenMap center={center} zoom={13}/>}
             </Box>
           </Grid>
           <Grid item xs></Grid>

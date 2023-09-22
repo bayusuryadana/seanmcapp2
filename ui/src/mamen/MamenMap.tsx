@@ -32,8 +32,18 @@ export const MamenMap = ({
     setMap(null)
   }, [])
 
-  const getStalls = (nw: { lat: number, lng: number }, se: { lat: number, lng: number }) => {
-    axios.post('api/mamen', {
+  const onChangeHandler = async () => {
+    const bounds = map?.getBounds()
+    const nw = {
+      lat: bounds?.getNorthEast().lat() ?? 0,
+      lng: bounds?.getSouthWest().lng() ?? 0
+    }
+    const se = {
+      lat: bounds?.getSouthWest().lat() ?? 0,
+      lng: bounds?.getNorthEast().lng() ??0
+    }
+    
+    await axios.post('api/mamen', {
       filter: {
         geo: {
           nw: nw,
@@ -48,19 +58,6 @@ export const MamenMap = ({
     .catch((error) => {
       console.log(error)
     })
-  }
-
-  const onChangeHandler = () => {
-    const bounds = map?.getBounds()
-    const nw = {
-      lat: bounds?.getNorthEast().lat() ?? 0,
-      lng: bounds?.getSouthWest().lng() ?? 0
-    }
-    const se = {
-      lat: bounds?.getSouthWest().lat() ?? 0,
-      lng: bounds?.getNorthEast().lng() ??0
-    }
-    getStalls(nw, se)
   }
 
   const onMyLocationHandler = () => {

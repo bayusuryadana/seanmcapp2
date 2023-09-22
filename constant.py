@@ -3,67 +3,8 @@ from bs4 import BeautifulSoup
 
 telegram_bot_endpoint = os.environ['TELEGRAM_BOT_ENDPOINT']
 telegram_private_chat_id = 274852283
+telegram_group_chat_id = -1001359004262
 wallet_password = os.environ['WALLET_PASSWORD']
-
-# region city enum
-city_dict = {
-    1 : "Jakarta", 
-    2 : "Surabaya", 
-    3 : "Bali",
-    4 : "Pekanbaru",
-    5 : "Batam",
-    6 : "Palembang",
-    7 : "BandarLampung",
-    8 : "Bangka",
-    9 : "Belitung",
-    10 : "Padang",
-    11 : "Nias",
-    12 : "Bukittinggi",
-    13 : "Singkawang",
-    14 : "Palangkaraya",
-    15 : "Banjarmasin",
-    16 : "Samarinda",
-    17 : "Tangerang",
-    18 : "Yogyakarta",
-    19 : "Pontianak",
-    20 : "Bogor",
-    21 : "Semarang",
-    22 : "Bandung",
-    23 : "Manado",
-    24 : "BandaAceh",
-    25 : "Medan",
-    26 : "Solo",
-    27 : "Madura",
-    28 : "Cirebon",
-    29 : "TangerangSelatan",
-    30 : "Malang",
-    31 : "Kediri",
-    32 : "Purwakarta",
-    33 : "Tegal",
-    34 : "Balikpapan",
-    35 : "Sukabumi",
-    36 : "Lombok",
-    37 : "Makassar",
-    38 : "Purwokerto",
-    39 : "Penang",
-    40 : "KualaLumpur",
-    41 : "Karawang",
-    42 : "Serang",
-    43 : "Cilegon",
-    44 : "Bekasi",
-    45 : "Tasikmalaya",
-    46 : "Subang",
-    47 : "Jambi",
-    48 : "Bengkulu",
-    49 : "Kupang",
-    50 : "Ternate",
-    51 : "Ambon",
-    52 : "Depok",
-    53 : "Karangasem",
-    54 : "Sorong",
-    55 : "Jayapura"
-}
-# endregion
 
 # region news model
 
