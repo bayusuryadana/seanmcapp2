@@ -110,7 +110,6 @@ class Database:
                 "balance": balance,
                 "last_year_expenses": last_year_expenses,
                 "ytd_expenses": ytd_expenses, 
-                "pie": "not yet implemented!"
             },
             "savings": {
                 "dbs": dbs,
@@ -121,6 +120,64 @@ class Database:
                 "idr": planned_idr
             },
             "detail": this_month_data,
+        }
+    
+    def wallet_allocation(self, year):
+        allocation_query = """
+            SELECT year, category, currency, SUM(amount) AS expenses
+            FROM (
+                SELECT (date / 100) AS year, category, currency, amount 
+                FROM wallets
+                WHERE done = true AND category != 'Temp' AND name != 'Fikri'
+            ) AS temp
+            WHERE year >= %(prev_year)s AND year <= %(year)s
+            GROUP BY year, category, currency
+            ORDER BY year, category, currency
+        """
+        prev_year = (int(year))-1
+        self.cursor.execute(allocation_query, {"prev_year": prev_year, "year": year})
+        allocation_data = self.cursor.fetchall()
+
+        def _process_data(allocation_data_year):
+            sgd_transfer = [x for x in allocation_data_year if x['category'] == 'Transfer' and x['currency'] == 'SGD'][0]['expenses']
+            idr_trasfer = [x for x in allocation_data_year if x['category'] == 'Transfer' and x['currency'] == 'IDR'][0]['expenses']
+            kurs = int(idr_trasfer / sgd_transfer)
+            category_list = ['daily', 'rent', 'travel', 'fashion', 'it stuff', 'misc', 'wellness', 'funding', 'bonus', 'salary']
+            expense_result = []
+            for category in category_list:
+                category_data = [x for x in allocation_data_year if x['category'].lower() == category]
+                category_sum = 0
+                for data in category_data:
+                    if data['currency'] != 'SGD':
+                        # TODO: change to map if more than 1 currency
+                        category_sum = int(category_sum + (data['expenses'] / -kurs))
+                    else:
+                        category_sum = category_sum + (data['expenses'])
+                expense_result.append(category_sum)
+            expense_dict = dict(zip(category_list, expense_result))
+            income = expense_dict['bonus'] + expense_dict['salary']
+            total_expenses = sum(expense_result) - income
+            print(expense_result)
+            return {
+                "income": income,
+                "daily": expense_dict['daily'],
+                "rent": expense_dict['rent'],
+                "travel": expense_dict['travel'],
+                "fashion": expense_dict['fashion'],
+                "it_stuff": expense_dict['it stuff'],
+                "misc": expense_dict['misc'],
+                "wellness": expense_dict['wellness'],
+                "funding": expense_dict['funding'],
+                "total_expenses": total_expenses,
+                "kurs": -kurs,
+                # "data": allocation_data_year // open it if needed
+            }
+
+        this_year_allocation_data = [x for x in allocation_data if x['year'] == int(year)]
+        prev_year_allocation_data = [x for x in allocation_data if x['year'] == prev_year]
+        return {
+            "this_year": _process_data(this_year_allocation_data),
+            "prev_year": _process_data(prev_year_allocation_data)
         }
     
     def wallet_create(self, wallet: Wallet):

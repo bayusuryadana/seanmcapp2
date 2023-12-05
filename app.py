@@ -41,6 +41,9 @@ def wallet_get_auth(path):
                     return success_handler(response)
                 case 'porto':
                     response = db.wallet_porto_dashboard()
+                case 'allocation':
+                    year = request.args.get('year')
+                    response = db.wallet_allocation(year)
                     return success_handler(response)
         case 'POST':
             match path:

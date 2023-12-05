@@ -16,13 +16,8 @@ done:
 		mamen(web)
 
 high-prio:
-	portofolio(web)
-	portofolio(scheduler)
-	instagram + twitter (logged in) -> cache cleaner
+	portofolio(web + scheduler)
 	*new* blog(api + web)
-
-low-prio:
-	wallet: dashboard: pie?
 
 deprecated:
 	cbc
@@ -30,6 +25,7 @@ deprecated:
 	hadith
 	telegram webhook
 	discord
+	instagram + twitter (logged in) -> cache cleaner
 
 ## Setup
 python (left Windows, right Mac):
