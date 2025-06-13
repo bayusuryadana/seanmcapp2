@@ -2,3 +2,5 @@ __pycache__/
 .venv
 pyvenv.cfg
 .env
+.idea/
+__templates__/

@@ -15,7 +15,7 @@ def cleanup():
     print('stopping all scheduled task...')
     schedule.clear()
     print('closing DB connection...')
-    db.close_connection
+    db.close_connection()
     print('bye bye :)')
 
 atexit.register(cleanup)
@@ -71,17 +71,6 @@ def api(path):
             if request.method == 'GET':
                 result = db.mamen_cities()
                 return success_handler(result)
-        # case 'instagram':
-        #     if request.method == 'GET':
-        #         result = db.instagram()
-        #         return success_handler(result)
-        # case 'stalls':
-        #         return db.mamen_fetch_lat_lng()
-        # case 'cities':
-        #         return db.cities_fetch_lat_lng()
-        # case 'news':
-        #     scheduled_news()
-        #     return 'done'
         case _:
             raise Exception('resource not found')
 
@@ -125,13 +114,8 @@ def auth_error():
 ############### scheduled task starts here ###############
 
 def scheduled_task():
-    # https://schedule.readthedocs.io/en/stable/
-    schedule.every().day.at('06:00', 'Asia/Jakarta').do(db.scheduled_birthday)
-    schedule.every().day.at('08:00', 'Asia/Jakarta').do(scheduled_news)
-    schedule.every().day.at('20:00', 'Asia/Singapore').do(db.instagram)
-    # all_jobs = schedule.get_jobs()
-    # for j in all_jobs:
-    #     print(j.next_run)
+    schedule.every().day.at('06:00', 'Asia/Jakarta').do(lambda: threading.Thread(target=db.scheduled_birthday).start())
+    schedule.every().day.at('08:00', 'Asia/Jakarta').do(lambda: threading.Thread(target=scheduled_news).start())
     while True:
         schedule.run_pending()
         sleep(1)
